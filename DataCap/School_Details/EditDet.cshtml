@@ -2,7 +2,7 @@
     //co_id to associate Person with the CO they work for.
     var co_id = Request["id"];
 
-    var sSQL = "SELECT * FROM SchoolDetails where CO_ID=@0";
+    var sSQL = "SELECT * FROM SchoolDetails where Loc_ID=@0";
     var db = Database.Open("DDIncV2");
     var qryDet = db.QuerySingle(sSQL, co_id);
 
@@ -105,7 +105,7 @@
         <div class="form-group"> 
         <label for="FA_Svcr_ID" class="control-label">FA Servicer</label>
             <select name="FA_Svcr_ID" size="1" class="form-control">
-            @foreach(var row in sel_FA)
+            @foreach(var row in sel_FA_Svc)
             {
                 <option value = "@row.Item_ID">@row.Item</option>
             } </select>
@@ -114,7 +114,7 @@
         <div class="form-group"> 
         <label for="FA_Svcr_ID" class="control-label">FA Auditor</label>
             <select name="FA_Svcr_ID" size="1" class="form-control">
-            @foreach(var row in sel_FA)
+            @foreach(var row in sel_FA_Aud)
             {
                 <option value = "@row.Item_ID">@row.Item</option>
             } </select>
