@@ -13,26 +13,26 @@
 }
 
 <h2>Login</h2>
-
+<div style ="max-width: 300px; margin-left:2%;  ">
 <form method="post">
 
 <!--    <p>    <a style="width: 120px;" href="~/Account/Create.cshtml" >Create a User Account</a></p> -->
 
-    <p>
-        <label>Username</label>
-        <input type="text" name="username" value="@username" />
-    </p>
+    <fieldset>
+    <div class="form-group">
+        <label for="username" class="control-label">Username</label>
+        <input type="text" name="username" value="@username" class="form-control" placeholder="Enter User Name" />
+    </div>
     
-    <p>
-        <label>Password</label>
-        <input type="password" name="password" />
-    </p>
+    <div class="form-group">
+        <label for="password" class="control-label">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="Enter Password" />
+    </div>
     
-   
+    </fieldset>   
     <p><input class="btn btn-default btn-lg" type="submit" value="Login" /></p>
 
     <p>&nbsp</p>
-
-
     
 </form>
+</div>
