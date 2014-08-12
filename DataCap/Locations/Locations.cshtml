@@ -1,0 +1,59 @@
+﻿@{
+    var co_id = Request["id"];
+
+    var sSQL = "select l.LocationID, l.CO_ID, l.Loc_Branch_Name, l.Address, l.City, l.ST, l.Zip, l.Website, l.CO_Email from dbo.Location as l where l.CO_ID = @0";
+    var db = Database.Open("DDIncV2");
+    var qryLoc = db.Query(sSQL, co_id);
+    var gLocations = new WebGrid(qryLoc, rowsPerPage: 15);
+
+    sSQL = @"select CO.CO_Abbrev_Name, CO_Name,  Type.Item as CO_Type, stat.Item as CO_Status, CoMainPhone
+                , p.FirstName + ' ' + p.LastName as Contact
+                from dbo.Company as CO
+                inner join dbo.Masters as Type on type.Item_ID =co.CO_Type_ID
+                inner join dbo.Masters as stat on stat.Item_ID = co.CO_Status_ID
+                left join dbo.Person as p on p.PersID = co.Main_Contact_ID
+                where CO.CO_ID=@0";
+
+        var qryCompany = db.QuerySingle(sSQL, co_id);
+
+}
+
+<h2>Location(s) for @DDCHelpers.Form_CO_Name(co_id)</h2>
+<br/>
+
+<div class="table table-responsive">
+    @gLocations.GetHtml(
+    tableStyle: "table webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
+    columns: 
+    gLocations.Columns(
+        gLocations.Column("CO_ID", header: "Action", format: 
+        @<text><a class="btn btn-default btn-xs" title="Edit Location Info" href="~/DataCap/Locations/EditLoc.cshtml?loc=@item.LocationID&id=@item.CO_ID" >E</a> |
+         @if (qryCompany.CO_Type == "School"){
+           <span> <a class="btn btn-default btn-xs" title="School Details" href="~/Datacap/School_Details/SchoolDetails.cshtml?loc=@item.LocationID&id=@item.CO_ID" >Det</a> | </span>
+        }
+
+                <a class="btn btn-default btn-xs" title="Add/Edit/Delete Phone Numbers" href="~/DataCap/Locations/PhonesLoc.cshtml?loc=@item.LocationID&id=@item.CO_ID" >Ph</a> 
+        </text> ),
+        gLocations.Column("Loc_Branch_Name", "Office/Branch Name"),
+        gLocations.Column("Address", "Address"),
+        gLocations.Column("City", "City"),
+        gLocations.Column("ST", "State"),
+        gLocations.Column("Zip", "Zip"),
+        gLocations.Column("Website", "Website"),
+        gLocations.Column("CO_Email", "E-Mail")
+        )
+    )
+    <p>&nbsp</p>
+</div>
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Companies/WorkCo.cshtml?id=@co_id" >Back</a>
+     &nbsp
+    <a class="btn btn-default btn-lg" href="CreateLoc.cshtml?id=@co_id" >Create a New Branch/Location</a>
+
+</p>

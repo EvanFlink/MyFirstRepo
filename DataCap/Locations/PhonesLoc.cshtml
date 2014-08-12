@@ -1,0 +1,180 @@
+﻿@{
+    var id = Request["id"];
+    var loc = Request["loc"];
+
+    var sSQL = @"select l.LocationID, l.CO_ID, l.Loc_Branch_Name
+                , l.Phone1, l.Ph_Type1, l.Extn1, l.Phone2, l.Ph_Type2, l.Extn2, l.Phone3, l.Ph_Type3, l.Extn3
+                , l.Phone4, l.Ph_Type4 , l.Extn4, l.Phone5, l.Ph_Type5, l.Extn5 
+                from Location as l where l.CO_ID = @0 and l.LocationID=@1";
+    var db = Database.Open("DDIncV2");
+    var qryLocPh = db.QuerySingle(sSQL, id, loc);
+    
+    //Write code to find Phonetype = 'Business Main' in Masters table - it may not always be this value
+    var BusinessMainType = 10;
+ 
+    //Get the existing field values from the record
+    var Phone_1 = qryLocPh.Phone1;
+    //Phone1 is always 'Business Main'
+    var Ph_Type_1 = qryLocPh.Ph_Type1 == null ? BusinessMainType : qryLocPh.Ph_Type1;
+    var Extn_1 = qryLocPh.Extn1;
+    var Phone_2 = qryLocPh.Phone2;
+    var Ph_Type_2 = qryLocPh.Ph_Type2 == null ? 0 : qryLocPh.Ph_Type2;
+    var Extn_2 = qryLocPh.Extn2;
+    var Phone_3 = qryLocPh.Phone3;
+    var Ph_Type_3 = qryLocPh.Ph_Type3 == null ? 0 : qryLocPh.Ph_Type3;
+    var Extn_3 = qryLocPh.Extn3;
+    var Phone_4 = qryLocPh.Phone4;
+    var Ph_Type_4 = qryLocPh.Ph_Type4 == null ? 0 : qryLocPh.Ph_Type4;
+    var Extn_4 = qryLocPh.Extn4;
+    var Phone_5 = qryLocPh.Phone5;
+    var Ph_Type_5 = qryLocPh.Ph_Type5 == null ? 0 : qryLocPh.Ph_Type5;
+    var Extn_5 = qryLocPh.Extn5;
+
+ 
+    var qryPh_Type = db.Query(@DDCHelpers.MasterListQuery("Phone Type")); 
+    var listPh_Type = qryPh_Type.Select(x => new SelectListItem 
+                {
+                    Value = x.Item_ID.ToString(),
+                    Text = x.Item
+                });
+
+//update & save
+    if(IsPost){
+        Phone_1 = Request["Phone_1"];
+        Ph_Type_1 = Request["Ph_Type_1"];
+        Extn_1 = Request["Extn_1"];
+        Phone_2 = Request["Phone_2"];
+        Ph_Type_2 = Request["Ph_Type_2"];
+        Extn_2 = Request["Extn_2"];
+        Phone_3 = Request["Phone_3"];
+        Ph_Type_3 = Request["Ph_Type_3"];
+        Extn_3 = Request["Extn_3"];
+        Phone_4 = Request["Phone_4"];
+        Ph_Type_4 = Request["Ph_Type_4"];
+        Extn_4 = Request["Extn_4"];
+        Phone_5 = Request["Phone_5"];
+        Ph_Type_5 = Request["Ph_Type_5"];
+        Extn_5 = Request["Extn_5"];
+
+        var SQLUPDATE = @"UPDATE Location Set Phone1=@1, Ph_Type1=@2, Phone2=@3,  Ph_Type2=@4, Phone3=@5, Ph_Type3=@6, Phone4=@7, Ph_Type4=@8, Phone5=@9, Ph_Type5=@10  
+                        Extn1=@11, Extn2=@12, Extn3=@13, Extn4=@14, Extn5=@5 WHERE LocationID=@0";
+        //Response.Write(loc + ", " + Phone_1 + ", " + Ph_Type_1 + ", " + Phone_2 + ", " + Ph_Type_2 );
+        db.Execute(SQLUPDATE, loc, Phone_1, Ph_Type_1, Phone_2,  Ph_Type_2, Phone_3, Ph_Type_3, Phone_4, Ph_Type_4, Phone_5, Ph_Type_5, Extn_1, Extn_2, Extn_3, Extn_4, Extn_5);
+        Response.Redirect("~/Datacap/Locations/Locations?id=" + @id);
+        }
+
+}
+
+<h2>Phones for the @DDCHelpers.Form_LocName(loc) Location for @DDCHelpers.Form_CO_Name(id)</h2>
+<br/>
+
+<div style ="max-width: 800px; margin-left:2%;  ">
+    <form action="" method="post">
+    <table class="table">
+        <tr>
+            <th style="width: 13%"></th>
+            <th style="width: 35%">Phone Number</th>
+            <th style="width: 12%">Extension</th>
+            <th  style="width: 35%">Phone Type</th>
+        </tr>
+        <tr>
+            <td><b>Main Phone</b></td>
+            <td>
+                <div class="form-group">
+                    <input type="text" name="Phone_1" class="form-control"  placeholder="Area + Phone, Ex: 212-555-1212" value="@Phone_1">
+                </div><br/>
+            </td>
+            <td>
+                <div class="form-group">
+                    <input type="text" name="Extn_1" class="form-control"  placeholder="Ex: 1234" value="@Extn_1">
+                </div><br/>
+            </td>
+            <td>
+                <div class="form-group"> 
+                    @Html.DropDownList("Ph_Type_1", "===None===" , listPh_Type, Ph_Type_1, new{ @size="1", @class="form-control"})
+                </div><br/>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Phone2</b></td>
+            <td>
+                <div class="form-group">
+                    <input type="text" name="Phone_2" class="form-control"  placeholder="Area + Phone, Ex: 212-555-1212" value="@Phone_2">
+                </div><br/>
+            </td>
+            <td>
+                <div class="form-group">
+                    <input type="text" name="Extn_2" class="form-control"  placeholder="Ex: 1234" value="@Extn_2">
+                </div><br/>
+            </td>
+            <td>
+                <div class="form-group"> 
+                    @Html.DropDownList("Ph_Type_2", "===None===" , listPh_Type, Ph_Type_2, new{ @size="1", @class="form-control"})
+                </div><br/>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Phone3</b></td>
+            <td>
+                <div class="form-group">
+                    <input type="text" name="Phone_3" class="form-control"  placeholder="Area + Phone, Ex: 212-555-1212" value="@Phone_3">
+                </div><br/>
+            </td>
+            <td>
+                <div class="form-group">
+                    <input type="text" name="Extn_3" class="form-control"  placeholder="Ex: 1234" value="@Extn_3">
+                </div><br/>
+            </td>
+            <td>
+                <div class="form-group"> 
+                    @Html.DropDownList("Ph_Type_3", "===None===" , listPh_Type, Ph_Type_3, new{ @size="1", @class="form-control"})
+                </div><br/>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Phone4</b></td>
+            <td>
+                <div class="form-group">
+                    <input type="text" name="Phone_4" class="form-control"  placeholder="Area + Phone, Ex: 212-555-1212" value="@Phone_4">
+                </div><br/>
+            </td>
+            <td>
+                <div class="form-group">
+                    <input type="text" name="Extn_4" class="form-control"  placeholder="Ex: 1234" value="@Extn_4">
+                </div><br/>
+            </td>
+            <td>
+                <div class="form-group"> 
+                    @Html.DropDownList("Ph_Type_4", "===None===" , listPh_Type, Ph_Type_4, new{ @size="1", @class="form-control"})
+                </div><br/>
+            </td>
+        </tr>
+        <tr>
+            <td><b>Phone5</b></td>
+            <td>
+                <div class="form-group">
+                    <input type="text" name="Phone_5" class="form-control"  placeholder="Area + Phone, Ex: 212-555-1212" value="@Phone_5">
+                </div><br/>
+            <td>
+                <div class="form-group">
+                    <input type="text" name="Extn_5" class="form-control"  placeholder="Ex: 1234" value="@Extn_5">
+                </div><br/>
+            </td>
+            </td>
+            <td>
+                <div class="form-group"> 
+                    @Html.DropDownList("Ph_Type_5", "===None===" , listPh_Type, Ph_Type_5, new{ @size="1", @class="form-control"})
+                </div><br/>
+            </td>
+        </tr>
+    
+    </table>
+    <input type="submit" value="Save Changes" class="btn btn-lg btn-default" />
+    
+    </form>
+</div>
+<br/>    
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Locations/Locations?id=@id" >Back</a>
+     &nbsp
+</p>

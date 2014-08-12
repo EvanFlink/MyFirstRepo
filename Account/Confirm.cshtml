@@ -1,0 +1,16 @@
+﻿@{
+    
+    var token = Request["token"];
+    
+    if(WebSecurity.ConfirmAccount(token)) {
+        <h2>Account Confirmed!</h2>
+        <div>Thank you for confirming your account.</div>
+    } else {
+        <h2>Account confirmation failed</h2>
+        <div>
+            Please check that you have not already verified this account
+            and that you are providing the correct confirmation token.
+        </div>
+    }
+    
+}

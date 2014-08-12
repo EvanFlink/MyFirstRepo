@@ -1,0 +1,35 @@
+﻿@{
+    var id=Request["id"];
+    
+    var sSQL = "SELECT * FROM Company where CO_ID=@0";
+
+    var db = Database.Open("DDIncV2");
+    var Co = db.QuerySingle(sSQL, id);
+
+    // write logic to provide CO_Name when CO_Abbrev_Name is null
+    var Form_CO_Name ="";
+    if(String.IsNullOrEmpty(Co.CO_Abbrev_Name))
+    { Form_CO_Name = Co.CO_Name; }
+    else
+        {if(String.IsNullOrEmpty(Co.CO_Name))
+            { Form_CO_Name = Co.CO_Abbrev_Name;}
+        else{ Form_CO_Name = Co.CO_Name + "("+ Co.CO_Abbrev_Name +")";}
+    }
+
+    if(IsPost){
+        var sSQL_Delete = "DELETE FROM Company WHERE CO_ID=@0";
+        db.Execute(sSQL_Delete,id);
+        Response.Redirect("companies.cshtml");
+        }
+}
+
+<h1>Delete a Company</h1>
+<p>&nbsp</p>
+<p style="font-family: Calibri; font-size: 180% ; font-weight: 300 ">Are you sure you want to delete <span style="font-weight: 900">@Form_CO_Name ?</span></p>
+<p>&nbsp</p>
+<form action="" method="post">
+    <input class="btn btn-default btn-lg" type="submit" value="Yes"/>
+    <input class="btn btn-default btn-lg" type="button" value="No" onclick="window.location = 'Companies.cshtml'" />
+</form>
+
+

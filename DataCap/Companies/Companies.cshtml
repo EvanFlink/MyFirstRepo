@@ -1,0 +1,56 @@
+﻿@{
+    WebSecurity.RequireAuthenticatedUser();
+
+    var sSQL = @"select CO.CO_ID, CO.CO_Abbrev_Name, CO_Name,  Type.Item as CO_Type, stat.Item as CO_Status
+                , l.city + ', ' + l.ST as Main_Office
+                ,CoMainPhone
+                , p.FirstName + ' ' + p.LastName as Contact
+                , P.Phone1 as Contact_Phone
+                from dbo.Company as CO
+                inner join dbo.Masters as Type on type.Item_ID =co.CO_Type_ID
+                inner join dbo.Masters as stat on stat.Item_ID = co.CO_Status_ID
+                left join dbo.Person as p on p.PersID = co.Main_Contact_ID
+                left join dbo.Location as l on l.CO_ID = CO.CO_ID and (l.Loc_Branch_Name like 'Main%')
+                order by co.CO_Abbrev_Name;";
+
+    var db = Database.Open("DDIncV2");
+    var qryCompanies = db.Query(sSQL);
+
+    var gCompanies = new WebGrid(qryCompanies, rowsPerPage: 10);
+
+}
+
+<h2>Companies</h2>
+<p>&nbsp</p>
+<div class="table-responsive">
+    @gCompanies.GetHtml(
+    tableStyle: "table webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
+    columns: 
+    gCompanies.Columns(
+        gCompanies.Column("CO_ID", header: "Action", format: 
+        @<text><a class="btn btn-default btn-xs" title="Edit Basic Company Info" href="~/DataCap/Companies/EditCo.cshtml?id=@item.CO_ID" >E</a> | 
+               <a class="btn btn-default btn-xs" title="Work with Associated Data" href="~/DataCap/Companies/WorkCo.cshtml?id=@item.CO_ID" >W</a>
+        </text> ),
+        gCompanies.Column("CO_Abbrev_Name", "Short Name"),
+        gCompanies.Column("CO_Name", "Full Name"),
+        gCompanies.Column("CO_Type", "Type"),
+        gCompanies.Column("CO_Status", "Status"),
+        gCompanies.Column("Main_Office", "Main Office"),
+        gCompanies.Column("CoMainPhone", "Main Phone"),
+        gCompanies.Column("Contact", "Main Contact"),
+        gCompanies.Column("Contact_Phone", "Contact Phone")
+        )
+    )
+    <p>&nbsp</p>
+</div>
+<p>
+    <a class="btn btn-default btn-lg" href="~/index.cshtml" >Back</a>
+    &nbsp
+    <a class="btn btn-default btn-lg" href="CreateCo.cshtml" >Create a New Company</a>
+</p>

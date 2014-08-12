@@ -1,0 +1,18 @@
+﻿@{
+    WebMail.SmtpServer = "smtp.gmail.com";
+    WebMail.UserName = "myuserame@gmail.com";
+    WebMail.Password = "myWebMailPassword";
+    WebMail.From = "DD Consulting, Inc.<admin@ddinc.biz";
+
+    @* the following two lines apply to the gmail server - setting may differe for other mail servers*@
+    WebMail.EnableSsl = true;
+    WebMail.SmtpPort = 587;
+
+    WebSecurity.InitializeDatabaseConnection(
+        "DDC_Inc_Users",
+        "Users",
+        "UserId",
+        "Username",
+        autoCreateTables: true
+    );
+    }

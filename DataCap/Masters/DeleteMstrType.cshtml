@@ -1,0 +1,27 @@
+﻿@{
+    var id=Request["id"];
+    var sSQL = "SELECT * FROM Master_Types where Master_ID=@0";
+
+    var db = Database.Open("DDIncV2");
+    var Mstr_Type = db.QuerySingle(sSQL, id);
+
+    var Type_Name = Mstr_Type.Master;
+    
+    if(IsPost){
+        var sSQL_Delete = "DELETE FROM Master_Types WHERE Master_ID=@0";
+        db.Execute(sSQL_Delete,id);
+        Response.Redirect("MasterTypes.cshtml");
+        }
+}
+
+<h1 style="text-align: center">Delete a Record from the Master Types Table</h1>
+<p>&nbsp</p>
+<h3 style="text-align: center">Note: Records in the Master Types Table <u><i>should not</i></u> be Deleted.</h3>
+<h3 style="text-align: center">Set the 'Active' field to 'False' instead.</h3><br/>
+<p style="font-family: Calibri; font-size: 180% ; font-weight: 300; text-align: center">
+    Are you sure you want to delete the <span style="font-weight: 900">@Type_Name </span>type from the Master Types table?</p>
+<p>&nbsp</p>
+<form action="" method="post">
+    <input class="btn btn-default btn-lg" type="submit" value="Yes"/>
+    <input class="btn btn-default btn-lg" type="button" value="No" onclick="window.location = 'MasterTypes.cshtml'" />
+</form>

@@ -1,0 +1,46 @@
+﻿@{
+    WebSecurity.RequireAuthenticatedUser();
+
+    var sSQL = @"select p.PersID, p.CO_ID, p.FirstName, p.LastName, p.Phone1 + ' ' + p.Extn1 as ContactPhone
+                , case when c.CO_Abbrev_Name is null or c.CO_Abbrev_Name ='' then CO_Name else c.CO_Abbrev_Name end as Company
+                , p.Title, p.Department
+                , case when p.PersID = c.Main_Contact_ID then 'Yes' else '' end as IsMainContact 
+                from dbo.Person as P 
+                inner join Company as C on c.CO_ID = p.CO_ID";
+
+    var db = Database.Open("DDIncV2");
+    var qryPeople = db.Query(sSQL);
+
+    var gPeople = new WebGrid(qryPeople, rowsPerPage: 10);
+
+}
+
+<h2>People</h2>
+<p>&nbsp</p>
+<div class="table-responsive">
+    @gPeople.GetHtml(
+    tableStyle: "table webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
+    columns: 
+    gPeople.Columns(
+        gPeople.Column("FirstName", "First Name"),
+        gPeople.Column("LastName", "Last Name"),
+        gPeople.Column("ContactPhone", "Contact Phone"),
+        gPeople.Column("Company", "Company"),
+        gPeople.Column("Title", "Title"),
+        gPeople.Column("Department", "Department"),
+        gPeople.Column("IsMainContact", "Is Main Contact?")
+        )
+    )
+    <p>&nbsp</p>
+</div>
+<p>
+    <a class="btn btn-default btn-lg" href="~/index.cshtml" >Back</a>
+    &nbsp
+
+</p>

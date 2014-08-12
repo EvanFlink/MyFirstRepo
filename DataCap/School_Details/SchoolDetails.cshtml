@@ -1,0 +1,66 @@
+﻿@{
+    var id = Request["id"];
+    var loc= Request["loc"];
+    var sSQL = @"select CO.CO_Abbrev_Name, CO_Name, Main_Contact_ID
+                from dbo.Company as CO where CO.CO_ID=@0";
+
+    var db = Database.Open("DDIncV2");
+    var Co = db.QuerySingle(sSQL, id);
+
+    //get current detail set, if none, then just display create form
+    sSQL = @"select s.Loc_ID, ma.Item as AccredType, s.Title_IV, s.NumCampuses, s.NumEmployees, s.NumAdminStaff, s.NumInstructors
+             , Case when FA.CO_Abbrev_Name is null then fa.CO_Name else fa.CO_Abbrev_Name end as FA_Auditor_Name
+			 , Case when FS.CO_Abbrev_Name is null then FS.CO_Name else FS.CO_Abbrev_Name end as FS_Auditor_Name
+			 , Case when DS.CO_Abbrev_Name is null then DS.CO_Name else DS.CO_Abbrev_Name end as Def_Svcr_Name
+			 , Case when LG.CO_Abbrev_Name is null then LG.CO_Name else LG.CO_Abbrev_Name end as Lead_Gen_Name
+            from SchoolDetails as S
+            left join Masters as ma on s.AccreditationID = ma.Item_ID
+            left join Company as FA on FA.CO_ID = s.FA_Auditor_ID
+            left join Company as FS on FS.CO_ID = s.FS_Auditor_ID
+            left join Company as DS on DS.CO_ID = s.Default_Servicer_ID
+            left join Company as LG on LG.CO_ID = s.Lead_Gen_ID
+            where S.Loc_ID = @0";
+    var qryDetails = db.Query(sSQL, loc);
+    var gDetails = new WebGrid(qryDetails, rowsPerPage: 15);
+
+}
+
+    
+<h3>School Details for @DDCHelpers.Form_CO_Name(id)</h3>
+<br/>
+
+<div class="table-responsive">
+    @gDetails.GetHtml(
+    tableStyle: "table webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
+    columns: 
+    gDetails.Columns(
+        gDetails.Column("CO_ID", header: "Action", format: 
+        @<text><a class="btn btn-default btn-xs" title="Edit School Details" href="~/DataCap/School_Details/EditDet.cshtml?id=@item.Loc_ID" >E</a>
+        </text> ),
+        gDetails.Column("AccredType", "Accreditation"),
+        gDetails.Column("Title_IV", "Title IV"),
+        gDetails.Column("NumCampuses", "Campuses"),
+        gDetails.Column("NumEmployees", "Employees"),
+        gDetails.Column("NumAdminStaff", "Admin"),
+        gDetails.Column("NumInstructors", "Instructors"),
+        gDetails.Column("FA_Auditor_Name", "Fin. Aid Servicer"),
+        gDetails.Column("FS_Auditor_Name", "FS Auditor"),
+        gDetails.Column("Def_Svcr_Name", "Default Servicer"),
+        gDetails.Column("Lead_Gen_Name", "Lead Provider")
+        )
+    ) 
+    <p>&nbsp</p>
+</div>
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Locations/Locations.cshtml?id=@id" >Back</a>
+     &nbsp
+    @if(qryDetails.Count() == 0){
+    <a class="btn btn-default btn-lg" href="CreateDet.cshtml?id=@id&loc=@loc" >Create School Details</a>
+    }
+</p>

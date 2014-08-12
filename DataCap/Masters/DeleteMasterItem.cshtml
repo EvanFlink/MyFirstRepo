@@ -1,0 +1,32 @@
+﻿@{
+    var id=Request["id"];
+    
+    var sSQL = "SELECT * FROM Masters where Item_ID=@0";
+
+    var db = Database.Open("DDIncV2");
+    var Mstr_Item = db.QuerySingle(sSQL, id);
+
+    var Item_Name = Mstr_Item.Item;
+    var Master_Name = Mstr_Item.Master;
+
+    if(IsPost){
+        var sSQL_Delete = "DELETE FROM Masters WHERE Item_ID=@0";
+        db.Execute(sSQL_Delete,id);
+        Response.Redirect("Masters.cshtml");
+        }
+}
+
+<h1 style="text-align: center">Delete an Item from the Masters Table</h1>
+<p>&nbsp</p>
+<h3 style="text-align: center">Note: Items in the Master Table <u><i>should not</i></u> be Deleted.</h3>
+<h3 style="text-align: center">Set the 'Active' field to 'False' instead.</h3><br/>
+<p style="font-family: Calibri; font-size: 180% ; font-weight: 300; text-align: center">
+    Are you sure you want to delete the <span style="font-weight: 900">@Item_Name </span>item from the 
+    <span style="font-weight: 900">@Master_Name</span> Master?</p>
+<p>&nbsp</p>
+<form action="" method="post">
+    <input class="btn btn-default btn-lg" type="submit" value="Yes"/>
+    <input class="btn btn-default btn-lg" type="button" value="No" onclick="window.location = 'Masters.cshtml'" />
+</form>
+
+

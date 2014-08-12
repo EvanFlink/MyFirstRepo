@@ -1,0 +1,56 @@
+﻿@{    
+    var id=Request["id"];
+
+    var sSQL = "SELECT * FROM Master_Types where Master_ID=@0";
+    var db = Database.Open("DDIncV2");
+
+    //returns one record (row), a complex data type
+    var qryMasterTypes = db.QuerySingle(sSQL, id);
+
+    //Get the existing field values from the record
+    var Item_Name = qryMasterTypes.Master;
+    var Active_TF = qryMasterTypes.Active;
+
+
+//update & save
+    if(IsPost){
+        Item_Name = Request["Item_Name"];
+        Active_TF = Request["Active_TF"];
+
+        var SQLUPDATE = "UPDATE MasterTypes Set Master=@1, Active=@2  WHERE Master_ID=@0";
+//        Response.Write(id + ", " + Mstr_Type_ID + ", " + Mstr_Type_Name + ", " + Item_Name + ", " + Active_TF);
+        db.Execute(SQLUPDATE, id, Item_Name, Active_TF);
+        Response.Redirect("MasterTypes.cshtml");
+        }
+}
+
+<h2>Edit Type Name</h2><br/>
+
+<div style ="max-width: 500px; margin-left:2%;  ">
+<form action="" method="post">
+    <fieldset>
+    <div class="form-group">
+        <label for="Item_Name" class="control-label">Type Name</label>
+        <input type="text" name="Item_Name" class="form-control" placeholder="Type Item Name" value="@Item_Name">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Active_TF" class="control-label">Active (True/False)</label>
+            <select name="Active_TF" size="1" class="form-control">
+                <option value = "1">True</option>
+                <option value = "0">False</option>
+            </select>
+    </div><br/>
+
+    </fieldset>
+    <input type="submit" value="Save Changes" class="btn btn-lg btn-default" />
+</form>
+</div>
+<br/>
+
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Masters/MasterTypes.cshtml" >Back</a>
+    &nbsp
+    <a class="btn btn-default btn-lg pull-right" href="~/DataCap/Masters/DeleteMstrType.cshtml?id=@id" >Delete this Type</a>
+
+</p>

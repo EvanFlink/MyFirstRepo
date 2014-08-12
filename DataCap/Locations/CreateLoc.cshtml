@@ -1,0 +1,78 @@
+﻿@{
+        var co_id = Request["id"];
+        var Loc_Branch_Name = "";
+        var Loc_Addr = "";
+        var Loc_City = "";
+        var Loc_St = "";
+        var Loc_Zip = "";
+        var Loc_Website = "";
+        var Loc_Email = "";
+
+ 
+
+    if(IsPost)
+    {
+      Loc_Branch_Name = Request["Loc_Branch_Name"];
+      Loc_Addr = Request["Loc_Addr"];
+      Loc_City = Request["Loc_City"];
+      Loc_St = Request["Loc_St"];
+      Loc_Zip = Request["Loc_Zip"];
+      Loc_Website = Request["Loc_Website"];
+      Loc_Email = Request["Loc_Email"];
+
+      var sqlInsert = "INSERT INTO Location (CO_ID, Loc_Branch_Name, Address, City, St, Zip, Website, CO_Email) Values (@0, @1, @2, @3, @4, @5, @6, @7)";
+      var db = Database.Open("DDIncV2");
+      db.Execute(sqlInsert, @co_id, Loc_Branch_Name, Loc_Addr, Loc_City, Loc_St, Loc_Zip, Loc_Website, Loc_Email);
+      Response.Redirect("~/Datacap/Locations/Locations?id=" + @co_id);
+    }
+
+}
+
+<h2>Create a New Location/Branch for @DDCHelpers.Form_CO_Name(co_id)</h2>
+&nbsp
+<div style ="max-width: 500px; margin-left:2%;  ">
+<form action="" method="post">
+    
+    <fieldset>
+    <div class="form-group">
+        <label for="Loc_Branch_Name" class="control-label">Location/Branch Name</label>
+        <input type="text" name="Loc_Branch_Name" class="form-control" placeholder="Enter Branch or Campus Name, or Main Office, or Main Campus">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Loc_Addr" class="control-label">Address</label>
+        <input type="text" name="Loc_Addr" class="form-control" placeholder="Enter Street Address and Suite Number, if any.">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Loc_City" class="control-label">City</label>
+        <input type="text" name="Loc_City" class="form-control" placeholder="Enter City.">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Loc_St" class="control-label">State</label>
+        <input type="text" name="Loc_St" class="form-control" placeholder="Enter State.">
+    </div><br/>
+    <div class="form-group"> 
+        <label for="Loc_Zip" class="control-label">Zip</label>
+        <input type="text" name="Loc_Zip" class="form-control" placeholder="Enter Zip or Postal Code.">
+    </div><br/>
+    <div class="form-group"> 
+        <label for="Loc_Website" class="control-label">Website</label>
+        <input type="text" name="Loc_Website" class="form-control" placeholder="Ex: www.Myco.com.">
+    </div><br/>
+    <div class="form-group"> 
+        <label for="Loc_Email" class="control-label">Email Addr.</label>
+        <input type="text" name="Loc_Email" class="form-control" placeholder="Enter Email Address.">
+    </div><br/>
+
+    </fieldset>
+    <input type="submit" value="Add Location/Branch" class="btn btn-lg btn-default" />
+</form>
+</div>
+    &nbsp
+
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Locations/Locations.cshtml?id=@co_id" >Back</a>
+    &nbsp
+</p>

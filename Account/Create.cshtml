@@ -1,0 +1,82 @@
+﻿@{
+
+    var username = Request["username"];
+    var emailAddress = Request["emailAddress"];
+    var password = Request["password"];
+    var passwordConfirm = Request["passwordConfirm"];
+    
+    if(IsPost) {
+        if(username.IsEmpty()) {
+            ModelState.AddError("username", "Invalid username");
+        }
+    
+        @*if(emailAddress.IsEmpty()) {
+            ModelState.AddError("emailAddress", "Invalid email address");
+        }*@
+        
+        if(password.IsEmpty()) {
+            ModelState.AddError("password", "Invalid password");
+        }
+        
+        if(password != passwordConfirm) {
+            ModelState.AddError("passwordConfirm", "Passwords do not match!");
+        }
+        
+        if(ModelState.IsValid) {
+    
+            @*var token =*@
+             WebSecurity.CreateUserAndAccount(
+                username, password
+                @*, requireConfirmationToken: true*@
+            );
+            
+@*            var emailBody = @emailhelpers.NewUserConfirmation(username, token);
+            
+            WebMail.Send(
+                to: emailAddress,
+                subject: "New User Account Verification",
+                body: emailBody.ToString(),
+                isBodyHtml: true
+            );
+*@            
+            Response.Redirect("~/DataCap/DataMenu.cshtml");
+            
+}
+        
+        <div>
+            @Html.ValidationSummary()
+        </div>
+    }
+}
+
+<h2>Create Account</h2>
+
+<form method="post">
+
+    <p>
+        @Html.ValidationMessage("username", "*")
+        <label>Username</label>
+        <input type="text" name="username" value="@username"/>
+    </p>
+    
+@*   <p>
+        @Html.ValidationMessage("emailAddress", "*")
+        <label>Email Address</label>
+        <input type="text" name="emailAddress" value="@emailAddress"/>
+    </p>
+*@    
+    <p>
+        @Html.ValidationMessage("password", "*")
+        <label>Password</label>
+        <input type="password" name="password" />
+    </p>
+    
+    <p>
+        @Html.ValidationMessage("passwordConfirm", "*")
+        <label>Confirm</label>
+        <input type="password" name="passwordConfirm" />
+    </p>
+    <p>&nbsp</p>
+    <input type="submit" value="Create Account" />
+    
+</form>

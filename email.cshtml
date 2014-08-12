@@ -1,0 +1,33 @@
+﻿@{
+    
+    WebSecurity.RequireAuthenticatedUser();
+
+    if(IsPost) {
+            
+        WebMail.Send(
+            to: Request["to"],
+            subject: "Hello user!",
+            body: Request["body"]
+        );    
+    
+    }
+    
+}
+
+<h2>Send New Email</h2>
+
+<form method="post">
+    
+    <p>
+        <label>To:</label>
+        <input type="text" name="to" />
+    </p>
+    
+    <p>
+        <label>Body:</label>
+        <textarea name="body"></textarea>
+    </p>
+    
+    <input type="submit" value="Send Email" />
+        
+</form>

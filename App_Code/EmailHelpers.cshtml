@@ -1,0 +1,21 @@
+﻿
+@helper NewUserConfirmation(string username, string token) {
+    var relativeUrl = "~/Account/Confirm.cshtml?token="+token; 
+    var absoluteUrl = VirtualPathUtility.ToAbsolute(relativeUrl);
+    var verificationUrl = "http://" + Request.Url.Authority + absoluteUrl;
+    
+    <h1>Welcome to our site!</h1>
+    
+    <p>
+        Hello, @username!    
+    </p>
+    
+    <p>
+        Please click the following link to confirm 
+        that this is your valid email address:
+    </p>
+    
+    <p>
+        <a href="@verificationUrl">Verify Your New Account</a>
+    </p>
+}

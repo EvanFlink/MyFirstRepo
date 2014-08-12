@@ -1,0 +1,61 @@
+﻿@{
+      
+}
+
+<!DOCTYPE html>
+
+<html lang='en'>
+<head>
+	<meta charset="iso-8859-1" />
+	<title> DD Consulting, Inc. Trial Layout</title>
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" HREF="~/CSS?custom.css" media="screen" />
+    <script src="js/respond.min.js"></script></body>
+
+</head>
+
+<body > 
+<div class ="container" id="outer">
+	<div class ="row">
+		<p><img src="~/images/logo%20v2.jpg" height="86" width="455" alt="DD Consulting logo" title="DD Consulting, Inc." class="img-responsive" /></p>
+	</div>
+	<div class="row">
+       <p class="divider"> @DDCHelpers.DividerLine()</p>
+	</div>
+	<div class="row">
+		<nav class="navbar navbar-default navbar-inverse" role="navigation">
+        <ul class="nav navbar-nav">
+			<li><a href="~/Datacap/Companies/Companies.cshtml" >Companies</a></li>
+			<li><a href="~/Datacap/People/People.cshtml" >People</a></li>
+			<li><a href="~/Datacap/Questions/Questions.cshtml" >Questions</a></li>
+            <li class="dropdown"><a href="#" data-toggle="dropdown">Masters <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="~/Datacap/Masters/Masters.cshtml">'Masters' Table</a></li>
+                    <li><a href="~/Datacap/Masters/MasterTypes.cshtml">'Master Types' Table</a></li>
+                </ul>                    
+            </li>
+			<li><a href="Users.cshtml" >User Accounts</a></li>
+        </ul>
+		</nav>
+	</div>	
+
+	<div id="mid">
+
+    @RenderBody()
+	<div class="divider">
+        @DDCHelpers.DividerLine()
+	</div>
+	</div>
+<footer>
+<a href="mailto:info@DDinc.biz"><img src="~/images/email.jpg" alt="mailto:info@DDinc.biz" height="15" width="220" ></a>&nbsp
+<img src="~/images/phone.jpg" alt="Phone: 646.417.2901" height="14" width="204" >
+<p>&copy; 2014 - DD Consulting, Inc.</p>
+</footer>
+</div>	<!-- div 'outer'-->
+
+<!-- javascript -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    @RenderSection("script", required: false)
+</body>
+</html>

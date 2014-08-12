@@ -1,0 +1,75 @@
+﻿@{
+    var id = Request["id"];
+
+    var sSQL = @"select CO.CO_Abbrev_Name, CO_Name,  Type.Item as CO_Type, stat.Item as CO_Status, CoMainPhone
+                , p.FirstName + ' ' + p.LastName as Contact
+                from dbo.Company as CO
+                inner join dbo.Masters as Type on type.Item_ID =co.CO_Type_ID
+                inner join dbo.Masters as stat on stat.Item_ID = co.CO_Status_ID
+                left join dbo.Person as p on p.PersID = co.Main_Contact_ID
+                where CO.CO_ID=@0";
+
+    var db = Database.Open("DDIncV2");
+    var qryCompany = db.Query(sSQL, id);
+
+     var gCo = new WebGrid(qryCompany, rowsPerPage: 10);
+
+    //gCo.RootTable.Columns.GetNamedItem("MainPhone").Visible = false;
+    
+}
+
+<h2>Work with Company</h2>
+<br/>
+
+<div class="table-responsive">
+    @gCo.GetHtml(
+    tableStyle: "table webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
+    columns: 
+    gCo.Columns(
+        gCo.Column("CO_Abbrev_Name", "Short Name"),
+        gCo.Column("CO_Name", "Full Name"),
+        gCo.Column("CO_Type", "Type"),
+        gCo.Column("CO_Status", "Status"),
+        gCo.Column("CoMainPhone", "Main Phone"),
+        gCo.Column("Contact", "Main Contact")
+        )
+    )
+
+<!--    <table class="table">
+        <tr>
+            <th>Short Name</th>
+            <th>Full Name</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Main Phone</th>
+            <th>Main Contact</th>
+        </tr>
+        <tr>
+@*            <td>@qryCompany.CO_Abbrev_Name </td>
+            <td>@qryCompany.CO_Name </td>
+            <td>@qryCompany.CO_Type </td>
+            <td>@qryCompany.CO_Status </td>
+            <td>@qryCompany.CoMainPhone</td>
+            <td>@qryCompany.Contact </td>
+*@        </tr>
+    </table>
+-->
+<br/>
+<br/>
+
+</div>
+<p>    <a class="btn btn-default btn-lg" href="~/Datacap/Locations/Locations.cshtml?id=@id" >Branch/Location(s)</a>
+        &nbsp
+        <a class="btn btn-default btn-lg" href="~/Datacap/Persons/Persons.cshtml?id=@id" >Staff/Contacts/Personnel</a>
+        &nbsp
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Companies/Companies.cshtml" >Back</a>
+    &nbsp
+    <a class="btn btn-default btn-lg pull-right" href="~/DataCap/Companies/DeleteCo.cshtml?id=@id" >Delete this Company</a>
+</p>

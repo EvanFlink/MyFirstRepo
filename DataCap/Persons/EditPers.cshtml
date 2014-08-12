@@ -1,0 +1,92 @@
+﻿@{
+    var Pers_id=Request["pers"];
+    var co_id=Request["id"];
+
+    var sSQL = "SELECT * FROM Person where PersID=@0";
+    var db = Database.Open("DDIncV2");
+
+    //returns one record (row), a complex data type
+    var qryPers = db.QuerySingle(sSQL, Pers_id);
+
+    //Get the existing field values from the record
+        var First_Name = qryPers.FirstName;
+        var Last_Name = qryPers.LastName;
+        var Title = qryPers.Title;
+        var Department = qryPers.Department;
+        var SetMainContact ="";
+
+//construct the dropdown lists
+        var sel_Dept = db.Query(@DDCHelpers.MasterListQuery("Department")); 
+
+
+//update & save
+    if(IsPost){
+        First_Name = Request["First_Name"];
+        Last_Name = Request["Last_Name"];
+        Title = Request["Title"];
+        Department = Request["Department"];
+        SetMainContact = Request["SetMainContact"];
+
+        var SQLUPDATE = "UPDATE Person Set FirstName=@1, LastName=@2, Title=@3,  Department=@4, CO_ID=@5  WHERE PersID=@0";
+        db.Execute(SQLUPDATE, Pers_id, First_Name, Last_Name, Title, Department, co_id);
+        Response.Write(SetMainContact);
+        if (SetMainContact == "Yes") 
+        {
+            SQLUPDATE = "UPDATE Company Set Main_Contact_ID=@0 WHERE CO_ID=@1";
+            db.Execute(SQLUPDATE, Pers_id, co_id);
+        }
+       Response.Redirect("~/Datacap/Persons/Persons?id=" + @co_id);
+        }
+}
+
+<h2>Edit Person Info</h2>
+&nbsp
+<div style ="max-width: 500px; margin-left:2%;  ">
+<form action="" method="post">
+    <fieldset>
+    <div class="form-group">
+        <label for="First_Name" class="control-label">First Name</label>
+        <input type="text" name="First_Name" class="form-control"value="@First_Name">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Last_Name" class="control-label">Last Name</label>
+        <input type="text" name="Last_Name" class="form-control" value="@Last_Name">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Title" class="control-label">Title</label>
+        <input type="text" name="Title" class="form-control"value="@Title">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Department" class="control-label">Department</label>
+            <select name="Department" size="1" class="form-control">
+            @foreach(var row in sel_Dept)
+            {
+                <option value = "@row.Item">@row.Item</option>
+            } </select>
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="MainContact" class="control-label">Set as Main Contact?</label>
+            <select name="SetMainContact" size="1" class="form-control">
+                <option value = "No">No</option>
+                <option value = "Yes">Yes</option>
+            </select>
+    </div><br/>
+
+    </fieldset>
+    <input type="submit" value="Save Changes" class="btn btn-lg btn-default" />
+</form>
+</div>
+<br/>
+
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Persons/Persons.cshtml?id=@co_id" >Back</a>
+    &nbsp
+    
+    <a class="btn btn-default btn-lg pull-right" href="~/DataCap/Persons/DeletePers.cshtml?id=@co_id&pers=@Pers_id" >Delete this Person</a>
+
+
+</p>

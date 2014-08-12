@@ -1,0 +1,64 @@
+﻿@{
+    var co_id = Request["id"];
+    var sSQL = @"select CO.CO_Abbrev_Name, CO_Name, Main_Contact_ID
+                from dbo.Company as CO
+                where CO.CO_ID=@0";
+
+    var db = Database.Open("DDIncV2");
+    var Co = db.QuerySingle(sSQL, co_id);
+
+    var Form_CO_Name ="";
+    if(String.IsNullOrEmpty(Co.CO_Abbrev_Name))
+    { Form_CO_Name = Co.CO_Name; }
+    else
+        {if(String.IsNullOrEmpty(Co.CO_Name))
+            { Form_CO_Name = Co.CO_Abbrev_Name;}
+        else{ Form_CO_Name = Co.CO_Name + "("+ Co.CO_Abbrev_Name +")";}
+    }
+
+    //get current people, if none, then just display create form
+    sSQL = @"select p.PersID, p.CO_ID, p.FirstName, p.LastName, p.Title, p.Department,p.Phone1 
+            , case when p.PersID = c.Main_Contact_ID then 'Yes' else '' end as IsMainContact 
+            from dbo.Person as P 
+            inner join Company as C on c.CO_ID = p.CO_ID
+            where P.CO_ID = @0";
+    var qryPersons = db.Query(sSQL, co_id);
+    var gPersons = new WebGrid(qryPersons, rowsPerPage: 15);
+
+}
+
+    
+
+<h2>Staff/Personnel for @DDCHelpers.Form_CO_Name(co_id)</h2>
+<br/>
+
+<div class="table-responsive">
+    @gPersons.GetHtml(
+    tableStyle: "table webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
+    columns: 
+    gPersons.Columns(
+        gPersons.Column("CO_ID", header: "Action", format: 
+        @<text><a class="btn btn-default btn-xs" title="Edit Location Info" href="~/DataCap/Persons/EditPers.cshtml?id=@item.CO_ID&pers=@item.PersID" >E</a> |
+                <a class="btn btn-default btn-xs" title="Add/Edit Phone Numbers" href="~/DataCap/Persons/PhonesPers.cshtml?pers=@item.PersID&id=@item.CO_ID" >Ph</a> 
+        </text> ),
+        gPersons.Column("FirstName", "First Name"),
+        gPersons.Column("LastName", "Last Name"),
+        gPersons.Column("Title", "Title"),
+        gPersons.Column("Department", "Department"),
+        gPersons.Column("Phone1", "Main Phone"),
+        gPersons.Column("IsMainContact", header: "Main Contact?")
+        )
+    ) 
+    <p>&nbsp</p>
+</div>
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Companies/WorkCo.cshtml?id=@co_id" >Back</a>
+     &nbsp
+    <a class="btn btn-default btn-lg" href="CreatePers.cshtml?id=@co_id" >Create a New Person</a>
+</p>

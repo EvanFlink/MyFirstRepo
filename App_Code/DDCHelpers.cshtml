@@ -1,0 +1,70 @@
+﻿@using System.Text.RegularExpressions;
+
+@functions {      
+    public static bool IsValidEmail(string s)
+         {
+             string pattern = @"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$";
+             return Regex.IsMatch(s, pattern);
+          }
+     
+
+     public static string MasterListQuery(string MasterType)
+     {
+        return @"SELECT Item_ID, Item 
+                FROM Masters as M inner join Master_Types as MT on M.Master_ID = MT.Master_ID
+                Where M.Active = 'True' and  MT.Master = '" + MasterType + "' ";
+     } 
+
+     public static string ThirdPartyListQuery(string ThirdPartyType)
+     {
+        return @"with m (ID, name, type) as (
+                select m.Item_ID, m.Item, m.Master 
+                from Masters as M inner join Master_Types as mt on m.Master_ID = mt.Master_ID 
+                where mt.Master = 'Company Type' )
+
+                SELECT C.CO_ID as Item_ID, 
+				case when C.CO_Abbrev_Name is null then C.CO_Name else C.CO_Abbrev_Name end as Item
+                FROM Company as C inner join m on c.CO_Type_ID = m.ID 
+                where m.name = '" + ThirdPartyType + "' ";
+     }
+     
+     public static string Form_CO_Name(string id)
+     {
+        var sSQL = @"select CO.CO_Abbrev_Name, CO_Name, Main_Contact_ID
+                from dbo.Company as CO where CO.CO_ID=@0";
+        var db = Database.Open("DDIncV2");
+        var Co = db.QuerySingle(sSQL, id);
+
+        if(String.IsNullOrEmpty(Co.CO_Abbrev_Name))
+            { return Co.CO_Name; }
+        else
+            {if(String.IsNullOrEmpty(Co.CO_Name))
+                { return Co.CO_Abbrev_Name;}
+            else{ return Co.CO_Name + "("+ Co.CO_Abbrev_Name +")";}
+             }
+    }
+
+     public static string Form_LocName(string loc)
+     {
+        var sSQL = @"select Loc_Branch_Name
+                from dbo.Location where LocationID=@0";
+        var db = Database.Open("DDIncV2");
+        return db.QueryValue(sSQL, loc);
+    }
+
+     public static string Form_PersName(string Pers)
+     {
+        var sSQL = @"select FirstName + ' ' + LastName
+                from dbo.Person where PersID=@0";
+        var db = Database.Open("DDIncV2");
+        return db.QueryValue(sSQL, Pers);
+    }
+
+ } 
+
+
+@helper DividerLine(){
+    @* Adjust the height & width in just one place*@
+    <img  src="~/images/line.jpg" alt="Dividing Line" height="5" width="1180" />
+}
+

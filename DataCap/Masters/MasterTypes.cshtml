@@ -1,0 +1,41 @@
+﻿@{
+    var sSQL = "SELECT Master_ID as Item_ID, Master as Item, Active FROM Master_Types where Active = 1";
+    var db = Database.Open("DDIncV2");
+    var sel_MTypes = db.Query(sSQL);
+
+    var gMTypes = new WebGrid(sel_MTypes, rowsPerPage: 10);
+    
+}
+
+<h2>Master Types</h2><br/>
+
+<!--Hide the webgrid when nothing is selected in the dropdown-->
+<div style ="max-width: 500px; margin-left:2%;">
+<div class="table-responsive">
+    @gMTypes.GetHtml(
+    tableStyle: "table webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
+    columns: 
+    gMTypes.Columns(
+        gMTypes.Column("Item_ID", header: "Action", format: 
+        @<text><a style="width: 120px;" href="~/DataCap/Masters/EditMstrTypes.cshtml?id=@item.Item_ID" >Edit</a>
+        </text> ),
+        gMTypes.Column("Item", "Type Name"),
+        gMTypes.Column("Active", "Active")
+        )
+    ) 
+    <p>&nbsp</p>
+</div>
+</div>
+
+
+<p>
+    <a class="btn btn-default btn-lg" href="~/index.cshtml" >Back</a>
+   &nbsp
+    <a class="btn btn-default btn-lg" href="CreateMstrType.cshtml" >Create a New Master Type</a>
+</p>

@@ -1,0 +1,53 @@
+﻿@{
+        var Mstr_Type_ID = Request["typeid"];
+        
+        var Item_Name = "";
+        var Active_TF = "";
+
+        var sSQL = "Select Master from Master_Types where Master_ID=@0";
+        var db = Database.Open("DDIncV2");
+ 
+        var Master_Name = db.QueryValue(sSQL, Mstr_Type_ID); 
+ 
+    if(IsPost)
+    {
+      Item_Name = Request["Item_Name"];
+      Active_TF = Request["Active_TF"];
+
+      var sqlInsert = "INSERT INTO Masters (Master_ID, Master, Item, Active) Values (@0, @1, @2, @3)";
+//       Response.Write(Mstr_Type_ID + ", " + Master_Name + ", " + Item_Name + ", " + Active_TF);
+      db.Execute(sqlInsert, Mstr_Type_ID, Master_Name, Item_Name, Active_TF);
+      Response.Redirect("Masters.cshtml");
+    }
+
+}
+
+<h2>Create a New Item in the @Master_Name Master</h2>
+&nbsp
+<div style ="max-width: 500px; margin-left:2%;  ">
+<form action="" method="post">
+    <fieldset>
+    <div class="form-group">
+        <label for="Item_Name" class="control-label">Item Name</label>
+        <input type="text" name="Item_Name" class="form-control" placeholder="Type Item Name">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Active_TF" class="control-label">Active (True/False)</label>
+            <select name="Active_TF" size="1" class="form-control">
+                <option disabled selected>--select an option--</option>
+                <option value = "1">True</option>
+                <option value = "0">False</option>
+            </select>
+    </div><br/>
+
+    </fieldset>
+    <input type="submit" value="Add Item" class="btn btn-lg btn-default" />
+</form>
+</div>
+<br/>
+
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Masters/Masters.cshtml" >Back</a>
+    &nbsp
+</p>

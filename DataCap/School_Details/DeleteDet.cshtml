@@ -1,0 +1,38 @@
+﻿@{
+    var co_id=Request["id"];
+
+    var sSQL ="";
+    var db = Database.Open("DDIncV2");
+
+//Get Co Name    
+    sSQL = "SELECT * FROM Company where CO_ID=@0";
+    var Co = db.QuerySingle(sSQL, co_id);
+    var Form_CO_Name ="";
+    if(String.IsNullOrEmpty(Co.CO_Abbrev_Name))
+    { Form_CO_Name = Co.CO_Name; }
+    else
+        {if(String.IsNullOrEmpty(Co.CO_Name))
+            { Form_CO_Name = Co.CO_Abbrev_Name;}
+        else{ Form_CO_Name = Co.CO_Name + "("+ Co.CO_Abbrev_Name +")";}
+    }
+
+
+//Do the Delete
+    if(IsPost){
+        var sSQL_Delete = "DELETE FROM SchoolDetails WHERE CO_ID=@0";
+        db.Execute(sSQL_Delete, co_id);
+      Response.Redirect("~/Datacap/School_Details/SchoolDetails?id=" + @co_id);
+        }
+ }
+
+<h1>Delete School Details</h1>
+<p>&nbsp</p>
+<p style="font-family: Calibri; font-size: 180% ; font-weight: 300 ">
+    Are you sure you want to delete the School Details for <span style="font-weight: 900">@Form_CO_Name ?</span></p>
+<p>&nbsp</p>
+<form action="" method="post">
+    <input class="btn btn-default btn-lg" type="submit" value="Yes"/>
+    <input class="btn btn-default btn-lg" type="button" value="No" onclick="window.location = 'SchoolDetails?id=' + @co_id" />
+</form>
+
+

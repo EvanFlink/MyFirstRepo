@@ -1,0 +1,67 @@
+﻿@{
+        var co_id = Request["id"];
+        var First_Name = "";
+        var Last_Name = "";
+        var Title = "";
+        var Department = "";
+
+        var sSQL = "";
+        var db = Database.Open("DDIncV2");
+
+//construct the dropdown lists
+        var sel_Dept = db.Query(@DDCHelpers.MasterListQuery("Department")); 
+ 
+    if(IsPost)
+    {
+      First_Name = Request["First_Name"];
+      Last_Name = Request["Last_Name"];
+      Title = Request["Title"];
+      Department = Request["Department"];
+
+      var sqlInsert = "INSERT INTO Person (FirstName, LastName, Title, Department, CO_ID) Values (@0, @1, @2, @3, @4)";
+      db.Execute(sqlInsert, First_Name, Last_Name, Title, Department, co_id);
+      Response.Redirect("~/Datacap/Persons/Persons?id=" + @co_id);
+    }
+
+}
+
+<h2>Create a New Person for @DDCHelpers.Form_CO_Name(co_id)</h2>
+&nbsp
+<div style ="max-width: 500px; margin-left:2%;  ">
+<form action="" method="post">
+    
+    <fieldset>
+    <div class="form-group">
+        <label for="First_Name" class="control-label">First Name</label>
+        <input type="text" name="First_Name" class="form-control" placeholder="Enter First Name.">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Last_Name" class="control-label">Last Name</label>
+        <input type="text" name="Last_Name" class="form-control" placeholder="Enter Last Name.">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Title" class="control-label">Title</label>
+        <input type="text" name="Title" class="form-control" placeholder="Ex: Director of Admissions">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Department" class="control-label">Department</label>
+            <select name="Department" size="1" class="form-control">
+            @foreach(var row in sel_Dept)
+            {
+                <option value = "@row.Item">@row.Item</option>
+            } </select>
+    </div><br/>
+
+    </fieldset>
+    <input type="submit" value="Add Person" class="btn btn-lg btn-default" />
+</form>
+</div>
+    &nbsp
+
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Persons/Persons.cshtml?id=@co_id" >Back</a>
+    &nbsp
+</p>

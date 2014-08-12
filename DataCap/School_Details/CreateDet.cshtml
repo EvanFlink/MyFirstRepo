@@ -1,0 +1,157 @@
+﻿@{
+        //co_id to associate Person with the CO they work for.
+        var co_id = Request["id"];
+        var loc = Request["loc"];
+
+        var Accred_ID = "";
+        var Title_IV = "";
+        var NumCamp = "";
+        var NumEmp = "";
+        var NumAdmin = "";
+        var NumInstr = "";
+        var FA_Svcr_ID = "";
+        var FA_Aud_ID = "";
+        var FS_Aud_ID = "";
+        var Def_Svcr_ID = "";
+        var LeadGen_ID = "";
+
+        var sSQL = "";
+        var db = Database.Open("DDIncV2");
+ 
+//Select Lists
+        var sel_Accred = db.Query(@DDCHelpers.MasterListQuery("Accreditation")); 
+        var sel_FA_Svcr = db.Query(@DDCHelpers.ThirdPartyListQuery("FA Servicer")); 
+        var sel_FA_Aud = db.Query(@DDCHelpers.ThirdPartyListQuery("FA Auditor")); 
+        var sel_FS = db.Query(@DDCHelpers.ThirdPartyListQuery("FS Auditor")); 
+        var sel_Leads = db.Query(@DDCHelpers.ThirdPartyListQuery("Lead Generator")); 
+        var sel_Default = db.Query(@DDCHelpers.ThirdPartyListQuery("Default Servicer")); 
+
+ 
+    if(IsPost)
+    {
+      Accred_ID = Request["Accred_ID"];
+      Title_IV = Request["Title_IV"] == "on" ? "1" : "0";
+      NumCamp = Request["NumCamp"];
+      NumEmp = Request["NumEmp"];
+      NumAdmin = Request["NumAdmin"];
+      NumInstr = Request["NumInstr"];
+      FA_Svcr_ID = Request["FA_Svcr_ID"];
+      FA_Aud_ID = Request["FA_Aud_ID"];
+      FS_Aud_ID = Request["FS_Aud_ID"];
+      Def_Svcr_ID = Request["Def_Svcr_ID"];
+      LeadGen_ID = Request["LeadGen_ID"];
+
+
+      var sqlInsert = @"INSERT INTO SchoolDetails (	[Loc_ID] ,[AccreditationID],[Title_IV],[NumCampuses]
+                          ,[NumEmployees],[NumAdminStaff],[NumInstructors],[FA_Auditor_ID],[FS_Auditor_ID]
+                          ,[Default_Servicer_ID],[Lead_Gen_ID]) Values (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10)";
+      db.Execute(sqlInsert, loc, Accred_ID, Title_IV, NumCamp, NumEmp, NumAdmin, NumInstr, FA_Svcr_ID, FS_Aud_ID, Def_Svcr_ID, LeadGen_ID);
+      Response.Redirect("~/Datacap/School_Details/SchoolDetails?id=" + @co_id + "&loc=" + @loc);
+    }
+
+}
+
+<h2>Create New School Details for @DDCHelpers.Form_CO_Name(co_id)</h2>
+&nbsp
+<div style ="max-width: 500px; margin-left:2%;  ">
+<form action="" method="post">
+    <fieldset>
+    <div class="form-group"> 
+        <label for="Accred_ID" class="control-label">Accreditation</label>
+            <select name="Accred_ID" size="1" class="form-control">
+            @foreach(var row in sel_Accred)
+            {
+                <option value = "@row.Item_ID">@row.Item</option>
+            } </select>
+    </div><br/>
+
+
+        <label for="Title_IV"  class="col-xs-4">Title IV</label>
+        <div class="col-xs-4">
+            <input type="checkbox" name="Title_IV" class="form-control">
+        </div>
+<br/>
+<br/><br/>
+    <div class="form-group"> 
+        <label for="NumCamp" class="col-xs-4"># Campuses</label>
+        <div class="col-xs-3">
+            <input type="text" name="NumCamp" class="form-control" >
+        </div>
+    </div><br/>
+<br/>
+    <div class="form-group"> 
+        <label for="NumEmp"  class="col-xs-4"># Employees</label>
+        <div class="col-xs-3">
+            <input type="text" name="NumEmp" class="form-control" >
+        </div>
+    </div><br/>
+<br/>
+    <div class="form-group"> 
+        <label for="NumAdmin"  class="col-xs-4"># Admin. Staff</label>
+        <div class="col-xs-3">
+            <input type="text" name="NumAdmin" class="form-control" >
+        </div>
+    </div><br/>
+<br/>
+    <div class="form-group"> 
+        <label for="NumInstr"  class="col-xs-4"># Instructors</label>
+        <div class="col-xs-3">
+            <input type="text" name="NumInstr" class="form-control" >
+        </div>
+    </div><br/>
+<br/><br/>
+        <div class="form-group"> 
+        <label for="FA_Svcr_ID" class="control-label">FA Servicer</label>
+            <select name="FA_Svcr_ID" size="1" class="form-control">
+            @foreach(var row in sel_FA_Svcr)
+            {
+                <option value = "@row.Item_ID">@row.Item</option>
+            } </select>
+    </div><br/>
+
+       <div class="form-group"> 
+        <label for="FA_Aud_ID" class="control-label">FA Auditor</label>
+            <select name="FA_Aud_ID" size="1" class="form-control">
+            @foreach(var row in sel_FA_Aud)
+            {
+                <option value = "@row.Item_ID">@row.Item</option>
+            } </select>
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="FS_Aud_ID" class="control-label">FS Auditor</label>
+            <select name="sel_FS" size="1" class="form-control">
+            @foreach(var row in sel_FS)
+            {
+                <option value = "@row.Item_ID">@row.Item</option>
+            } </select>
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Def_Svcr_ID" class="control-label">Default Servicer</label>
+            <select name="Def_Svcr_ID" size="1" class="form-control">
+            @foreach(var row in sel_Default)
+            {
+                <option value = "@row.Item_ID">@row.Item</option>
+            } </select>
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="LeadGen_ID" class="control-label">Lead Generator</label>
+            <select name="LeadGen_ID" size="1" class="form-control">
+            @foreach(var row in sel_Leads)
+            {
+                <option value = "@row.Item_ID">@row.Item</option>
+            } </select>
+    </div><br/>
+
+    </fieldset>
+    <input type="submit" value="Add Details" class="btn btn-lg btn-default" />
+</form>
+</div>
+    &nbsp
+
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/School_Details/SchoolDetails.cshtml?id=@co_id&loc=@loc" >Back</a>
+    &nbsp
+</p>
