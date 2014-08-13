@@ -1,95 +1,91 @@
 ﻿@{
-    var id=Request["id"];
+    var qid=Request["qid"];
 
-    var sSQL = "SELECT * FROM Company where CO_ID=@0";
+    var sSQL = "SELECT * FROM Question where Q_ID=@0";
     var db = Database.Open("DDIncV2");
 
     //returns one record (row), a complex data type
-    var qryCo = db.QuerySingle(sSQL, id);
+    var qryQ = db.QuerySingle(sSQL, qid);
 
     //Get the existing field values from the record
-    var CO_Abbrev_Name = qryCo.CO_Abbrev_Name;
-    var CO_Name = qryCo.CO_Name;
-    var CO_Type_ID = qryCo.CO_Type_ID;
-    var CO_Status_ID = qryCo.CO_Status_ID;
-    var Main_Contact_ID = qryCo.Main_Contact_ID;
-    var CO_Main_Phone = qryCo.CoMainPhone;
+    var Question = qryQ.Question;
+    var Cat_ID = qryQ.Cat_ID;
+    var Group_ID = qryQ.Group_ID;
+    var Dept_ID = qryQ.Dept_ID;
+    var Active = qryQ.Active;
 
 
 //construct the dropdown lists
-    //Company type - School, FA Provider, etc
-        var qryCO_Type = db.Query(@DDCHelpers.MasterListQuery("Company Type")); 
-        var listCO_Type = qryCO_Type.Select(x => new SelectListItem 
+    //Question Category - See Masters Table
+        var qryCategory = db.Query(@DDCHelpers.MasterListQuery("Question Category")); 
+        var listCategory = qryCategory.Select(x => new SelectListItem 
                     {
                        Value = x.Item_ID.ToString(),
                        Text = x.Item
                     });
 
-    //Company Status - Client, Vendor, etc
-        var qryCO_Status = db.Query(@DDCHelpers.MasterListQuery("Company Status")); 
-        var listCO_Status = qryCO_Status.Select(x => new SelectListItem 
+    //Question Group - See Masters Table
+        var qryGroup = db.Query(@DDCHelpers.MasterListQuery("Question Group")); 
+        var listGroup = qryGroup.Select(x => new SelectListItem 
                     {
                        Value = x.Item_ID.ToString(),
                        Text = x.Item
                     });
 
-    //Main Contact - a Person
-        sSQL = "SELECT PersID, FirstName + ' ' + LastName as FullName FROM Person Where CO_ID=" + id;
-        var qryMainContact = db.Query(sSQL); 
-        var listMainContact = qryMainContact.Select(x => new SelectListItem 
+    //Question Department - See Masters Table
+        var qryDept = db.Query(@DDCHelpers.MasterListQuery("Department")); 
+        var listDept = qryDept.Select(x => new SelectListItem 
                     {
-                       Value = x.PersID.ToString(),
-                       Text = x.FullName
+                       Value = x.Item_ID.ToString(),
+                       Text = x.Item
                     });
 //update & save
     if(IsPost){
-        CO_Abbrev_Name = Request["shortName"];
-        CO_Name = Request["fullName"];
-        CO_Type_ID = Request["CO_Type"];
-        CO_Status_ID = Request["CO_Status"];
-        Main_Contact_ID = Request["Main_Contact"];
-        CO_Main_Phone = Request["CO_Main_Phone"];
+        Question = Request["Question"];
+        Cat_ID = Request["Cat_ID"];
+        Group_ID = Request["Group_ID"];
+        Dept_ID = Request["Dept_ID"];
+        Active = Request["Active"];
 
-        var SQLUPDATE = "UPDATE Company Set CO_Abbrev_Name=@1, CO_Name=@2, CO_Type_ID=@3,  CO_Status_ID=@4, Main_Contact_ID=@5, CoMainPhone=@6  WHERE CO_ID=@0";
-//        Response.Write(id + ", " + CO_Abbrev_Name + ", " + CO_Name + ", " + CO_Type_ID + ", " + CO_Status_ID + ", " + Main_Contact_ID );
-        db.Execute(SQLUPDATE, id, CO_Abbrev_Name, CO_Name, CO_Type_ID, CO_Status_ID, Main_Contact_ID, CO_Main_Phone);
-        Response.Redirect("companies.cshtml");
+        var SQLUPDATE = "UPDATE Question Set Question=@1, Cat_ID=@2, Group_ID=@3,  Dept_ID=@4, Active=@5  WHERE Q_ID=@0";
+//        Response.Write(qid + ", " + CO_Abbrev_Name + ", " + CO_Name + ", " + CO_Type_ID + ", " + CO_Status_ID + ", " + Main_Contact_ID );
+        db.Execute(SQLUPDATE, qid, Question, Cat_ID, Group_ID, Dept_ID, Active);
+        Response.Redirect("Questions.cshtml");
         }
 }
 
-<h2>Edit Company Info</h2>
+<h2>Edit Question Info</h2>
 &nbsp
 <div style ="max-width: 500px; margin-left:2%;  ">
 <form action="" method="post">
     <fieldset>
     <div class="form-group">
-        <label for="shortName" class="control-label">Short Name</label>
-        <input type="text" name="shortName" class="form-control" placeholder="Ex: ABC" value="@CO_Abbrev_Name">
+        <label for="Question" class="control-label">Question</label>
+        <textarea rows="5" cols="50" name="Question" class="form-control" placeholder="Type in the Question (4000 characters max.)" >@Question</textarea>
+
     </div><br/>
 
     <div class="form-group"> 
-        <label for="fullName" class="control-label">Full Name</label>
-        <input type="text" name="fullName" class="form-control" placeholder="Ex: American Broadcasting Company, Inc." value="@CO_Name">
-    </div><br/>
-
-    <div class="form-group"> 
-        <label for="CO_Type" class="control-label">Type</label>
-        @Html.DropDownList("CO_Type", null , listCO_Type, CO_Type_ID, new{ @size="1", @class="form-control"})
+        <label for="Cat_ID" class="control-label">Category</label>
+        @Html.DropDownList("Cat_ID", null , listCategory, Cat_ID, new{ @size="1", @class="form-control"})
     </div><br/>
 
     <div class="form-group">    
-        <label for="CO_Type" class="control-label">Status</label>
-        @Html.DropDownList("CO_Status", null , listCO_Status, CO_Status_ID, new{ @size="1", @class="form-control"})
-    </div><br/>
-
-    <div class="form-group"> 
-        <label for="CO_Main_Phone" class="control-label">Main Phone Number</label>
-        <input type="text" name="CO_Main_Phone" class="form-control" value="@CO_Main_Phone">
+        <label for="Group_ID" class="control-label">Group</label>
+        @Html.DropDownList("Group_ID", null , listGroup, Group_ID, new{ @size="1", @class="form-control"})
     </div><br/>
 
     <div class="form-group">    
-        <label for="Main_Contact" class="control-label">Main Contact</label>
-        @Html.DropDownList("Main_Contact", null , listMainContact, Main_Contact_ID, new{ @size="1", @class="form-control"})
+        <label for="Dept_ID" class="control-label">Department</label>
+        @Html.DropDownList("Dept_ID", null , listDept, Dept_ID, new{ @size="1", @class="form-control"})
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Active" class="control-label">Active</label>
+            <select name="Active" size="1" class="form-control">
+                <option value = "1">True</option>
+                <option value = "0">False</option>
+            </select>
     </div><br/>
 
     </fieldset>
@@ -99,8 +95,8 @@
 <br/>
 
 <p>
-    <a class="btn btn-default btn-lg" href="~/Datacap/Companies/Companies.cshtml" >Back</a>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Questions/Questions.cshtml" >Back</a>
     &nbsp
-    <a class="btn btn-default btn-lg pull-right" href="~/DataCap/Companies/DeleteCo.cshtml?id=@id" >Delete this Company</a>
+    <a class="btn btn-default btn-lg pull-right" href="~/DataCap/Questions/DeleteQItem.cshtml?qid=@qid" >Delete this Question</a>
 
 </p>

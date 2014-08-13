@@ -46,8 +46,8 @@
     columns: 
     gMaster.Columns(
         gMaster.Column("Item_ID", header: "Action", format: 
-        @<text><a style="width: 120px;" href="~/DataCap/Masters/CreateMstrItem.cshtml?typeid=@item.Master_ID" >Create</a> |
-                <a style="width: 120px;" href="~/DataCap/Masters/EditMasterItem.cshtml?id=@item.Item_ID" >Edit</a>
+        @<text><a class="btn btn-default btn-xs" title="Create a New Item in the Masters Table" href="~/DataCap/Masters/CreateMstrItem.cshtml?typeid=@item.Master_ID" >C</a> |
+                <a class="btn btn-default btn-xs" title="Edit This Item" href="~/DataCap/Masters/EditMasterItem.cshtml?id=@item.Item_ID" >E</a>
         </text> ),
         gMaster.Column("Master", "Master Type"),
         gMaster.Column("Item", "Item Name"),
