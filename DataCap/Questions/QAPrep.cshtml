@@ -1,14 +1,139 @@
 ﻿@{
-    Page.Title = "Prep a Question List";
+    Page.Title = "Prep a Question Set";
+    var sSQL = @"select Q.Q_ID, Q.Question, Cat.Item as Category, Dept.Item as Department
+                , Grp.Item as Q_Group, Q.Active
+                from dbo.Question as Q
+                inner join dbo.Masters as Cat on Cat.Item_ID =Q.Cat_ID
+                inner join dbo.Masters as Dept on Dept.Item_ID = Q.Dept_ID
+                left join dbo.Masters as Grp on Grp.Item_ID = Q.Group_ID";
+
+    var db = Database.Open("DDIncV2");
+    var qryQuestions = db.Query(sSQL);
+
+     var gQ = new WebGrid(qryQuestions, rowsPerPage: 10);
+
 }
 
 <p>&nbsp</p>
 <h2>@Page.Title</h2>
 <p>&nbsp</p>
+<h4>Question Set for:</h4>
+<div style ="max-width: 768px; margin-left:2%;  ">
+<form action="" method="post">
+    <fieldset name="Question Set for:">
+        <table>
+            <tr>
+                <th>School</th>
+                <th>Campus</th>
+                <th>Department</th>
+                <th>Person</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>
+                <select name="School" size="1" class="form-control" style="width:200px;" >
+                <option disabled selected> -- select an option -- </option>
+@*                @foreach(var row in sel_Schools)
+                {
+                    <option @(Request["School"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
+                }*@ </select>
+                </td>
+                <td>
+                <select name="Campus" size="1" class="form-control" style="width:200px;" >
+                <option disabled selected> -- select an option -- </option>
+@*                @foreach(var row in sel_Campus)
+                {
+                    <option @(Request["Campus"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
+                }*@ </select>
+                </td>
+                <td>
+                <select name="Campus" size="1" class="form-control" style="width:200px;" >
+                <option disabled selected> -- select an option -- </option>
+@*                @foreach(var row in sel_Campus)
+                {
+                    <option @(Request["Campus"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
+                }*@ </select>
+                </td>
+                <td>
+                <select name="Campus" size="1" class="form-control" style="width:200px;" >
+                <option disabled selected> -- select an option -- </option>
+@*                @foreach(var row in sel_Campus)
+                {
+                    <option @(Request["Campus"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
+                }*@ </select>
+                </td>
+                <td><input type="submit" value="Select" class="btn btn-md btn-default" /></td>
+            </tr>
+        </table>
+
+    </fieldset>
+</form>
+</div>
+<p>&nbsp</p>
+<h4>Filter Questions on:</h4>
+<div style ="max-width: 768px; margin-left:2%;  ">
+<form action="" method="post">
+    <fieldset name="Filter Questions on:">
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Department</th>
+                <th>Group</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>
+                    <select name="Category" size="1" class="form-control" style="width:200px;" >
+                    <option disabled selected> -- select an option -- </option>
+                    </select>
+                </td>
+                <td>
+                    <select name="Dept" size="1" class="form-control" style="width:200px;" >
+                    <option disabled selected> -- select an option -- </option>
+                    </select>
+                </td>
+                <td>
+                    <select name="Group" size="1" class="form-control" style="width:200px;" >
+                    <option disabled selected> -- select an option -- </option>
+                    </select>
+                </td>
+                <td>
+                    <input type="submit" value="Select" class="btn btn-md btn-default" />
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+</form>
+</div>
+<p>&nbsp</p>
+
+
+<div class="table-responsive">
+    @gQ.GetHtml(
+    tableStyle: "table webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
+    columns: 
+    gQ.Columns(
+        gQ.Column("", header: "Select", format: 
+        @<text><a class="btn btn-default btn-xs" title="Create a New Question" href="~/DataCap/Questions/CreateQ.cshtml" >Add</a> </text> ),
+        gQ.Column("Question", "Question"),
+        gQ.Column("Category", "Category"),
+        gQ.Column("Department", "Department"),
+        gQ.Column("Q_Group", "Group")
+        )
+    )
+<br/><br/>
+</div>
+
 
 
 
 <p>
-    <a class="btn btn-default btn-lg" href="~/index.cshtml" >Back to Menu</a>
+    <a class="btn btn-default btn-lg" href="~/index.cshtml" >Home</a>
     &nbsp
 </p>
