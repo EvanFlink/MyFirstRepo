@@ -1,14 +1,48 @@
 ﻿@{
-    Page.Title = "Questions Placeholder";
+    Page.Title = "Work With Question List";
+    var sSQL = @"select Q.Q_ID, Q.Question, Cat.Item as Category, Dept.Item as Department
+                , Grp.Item as Q_Group, Q.Active
+                from dbo.Question as Q
+                inner join dbo.Masters as Cat on Cat.Item_ID =Q.Cat_ID
+                inner join dbo.Masters as Dept on Dept.Item_ID = Q.Dept_ID
+                left join dbo.Masters as Grp on Grp.Item_ID = Q.Group_ID";
+
+    var db = Database.Open("DDIncV2");
+    var qryQuestions = db.Query(sSQL);
+
+     var gQ = new WebGrid(qryQuestions, rowsPerPage: 10);
+
 }
 
 <p>&nbsp</p>
 <h2>@Page.Title</h2>
-<p>&nbsp</p>
+<br/>
 
+<div class="table-responsive">
+    @gQ.GetHtml(
+    tableStyle: "table webgrid-table",
+    headerStyle: "webgrid-header",
+    footerStyle: "webgrid-footer",
+    alternatingRowStyle: "webgrid-alternating-row",
+    selectedRowStyle: "webgrid-selected-row",
+    rowStyle: "webgrid-row-style",
+    mode: WebGridPagerModes.All,
+    columns: 
+    gQ.Columns(
+        gQ.Column("", header: "Action", format: 
+        @<text><a class="btn btn-default btn-xs" title="Create a New Question" href="~/DataCap/Questions/CreateQ.cshtml" >C</a> | 
+               <a class="btn btn-default btn-xs" title="Edit Question" href="~/DataCap/Questions/EditQ.cshtml?qid=@item.Q_ID" >E</a>
+        </text> ),
+        gQ.Column("Question", "Question"),
+        gQ.Column("Category", "Category"),
+        gQ.Column("Department", "Department"),
+        gQ.Column("Q_Group", "Group"),
+        gQ.Column("Active", "Active")
+        )
+    )
+<br/><br/>
+</div>
 
-
-<p>
     <a class="btn btn-default btn-lg" href="~/index.cshtml" >Back to Menu</a>
-    &nbsp
+    &nbsp    
 </p>

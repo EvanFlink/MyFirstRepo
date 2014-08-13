@@ -1,0 +1,106 @@
+﻿@{
+    var id=Request["id"];
+
+    var sSQL = "SELECT * FROM Company where CO_ID=@0";
+    var db = Database.Open("DDIncV2");
+
+    //returns one record (row), a complex data type
+    var qryCo = db.QuerySingle(sSQL, id);
+
+    //Get the existing field values from the record
+    var CO_Abbrev_Name = qryCo.CO_Abbrev_Name;
+    var CO_Name = qryCo.CO_Name;
+    var CO_Type_ID = qryCo.CO_Type_ID;
+    var CO_Status_ID = qryCo.CO_Status_ID;
+    var Main_Contact_ID = qryCo.Main_Contact_ID;
+    var CO_Main_Phone = qryCo.CoMainPhone;
+
+
+//construct the dropdown lists
+    //Company type - School, FA Provider, etc
+        var qryCO_Type = db.Query(@DDCHelpers.MasterListQuery("Company Type")); 
+        var listCO_Type = qryCO_Type.Select(x => new SelectListItem 
+                    {
+                       Value = x.Item_ID.ToString(),
+                       Text = x.Item
+                    });
+
+    //Company Status - Client, Vendor, etc
+        var qryCO_Status = db.Query(@DDCHelpers.MasterListQuery("Company Status")); 
+        var listCO_Status = qryCO_Status.Select(x => new SelectListItem 
+                    {
+                       Value = x.Item_ID.ToString(),
+                       Text = x.Item
+                    });
+
+    //Main Contact - a Person
+        sSQL = "SELECT PersID, FirstName + ' ' + LastName as FullName FROM Person Where CO_ID=" + id;
+        var qryMainContact = db.Query(sSQL); 
+        var listMainContact = qryMainContact.Select(x => new SelectListItem 
+                    {
+                       Value = x.PersID.ToString(),
+                       Text = x.FullName
+                    });
+//update & save
+    if(IsPost){
+        CO_Abbrev_Name = Request["shortName"];
+        CO_Name = Request["fullName"];
+        CO_Type_ID = Request["CO_Type"];
+        CO_Status_ID = Request["CO_Status"];
+        Main_Contact_ID = Request["Main_Contact"];
+        CO_Main_Phone = Request["CO_Main_Phone"];
+
+        var SQLUPDATE = "UPDATE Company Set CO_Abbrev_Name=@1, CO_Name=@2, CO_Type_ID=@3,  CO_Status_ID=@4, Main_Contact_ID=@5, CoMainPhone=@6  WHERE CO_ID=@0";
+//        Response.Write(id + ", " + CO_Abbrev_Name + ", " + CO_Name + ", " + CO_Type_ID + ", " + CO_Status_ID + ", " + Main_Contact_ID );
+        db.Execute(SQLUPDATE, id, CO_Abbrev_Name, CO_Name, CO_Type_ID, CO_Status_ID, Main_Contact_ID, CO_Main_Phone);
+        Response.Redirect("companies.cshtml");
+        }
+}
+
+<h2>Edit Company Info</h2>
+&nbsp
+<div style ="max-width: 500px; margin-left:2%;  ">
+<form action="" method="post">
+    <fieldset>
+    <div class="form-group">
+        <label for="shortName" class="control-label">Short Name</label>
+        <input type="text" name="shortName" class="form-control" placeholder="Ex: ABC" value="@CO_Abbrev_Name">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="fullName" class="control-label">Full Name</label>
+        <input type="text" name="fullName" class="form-control" placeholder="Ex: American Broadcasting Company, Inc." value="@CO_Name">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="CO_Type" class="control-label">Type</label>
+        @Html.DropDownList("CO_Type", null , listCO_Type, CO_Type_ID, new{ @size="1", @class="form-control"})
+    </div><br/>
+
+    <div class="form-group">    
+        <label for="CO_Type" class="control-label">Status</label>
+        @Html.DropDownList("CO_Status", null , listCO_Status, CO_Status_ID, new{ @size="1", @class="form-control"})
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="CO_Main_Phone" class="control-label">Main Phone Number</label>
+        <input type="text" name="CO_Main_Phone" class="form-control" value="@CO_Main_Phone">
+    </div><br/>
+
+    <div class="form-group">    
+        <label for="Main_Contact" class="control-label">Main Contact</label>
+        @Html.DropDownList("Main_Contact", null , listMainContact, Main_Contact_ID, new{ @size="1", @class="form-control"})
+    </div><br/>
+
+    </fieldset>
+    <input type="submit" value="Save Changes" class="btn btn-lg btn-default" />
+</form>
+</div>
+<br/>
+
+<p>
+    <a class="btn btn-default btn-lg" href="~/Datacap/Companies/Companies.cshtml" >Back</a>
+    &nbsp
+    <a class="btn btn-default btn-lg pull-right" href="~/DataCap/Companies/DeleteCo.cshtml?id=@id" >Delete this Company</a>
+
+</p>
