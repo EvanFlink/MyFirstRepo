@@ -1,7 +1,8 @@
 ﻿@{
     WebSecurity.RequireAuthenticatedUser();
 
-    var sSQL = @"select p.PersID, p.CO_ID, p.FirstName, p.LastName, p.Phone1 + ' ' + p.Extn1 as ContactPhone
+    var sSQL = @"select p.PersID, p.CO_ID, p.FirstName, p.LastName
+				, case when (p.phone1 is null) or (p.phone1 = '') then c.CoMainPhone else p.Phone1 + ' ' + IsNull(p.Extn1, '') end as ContactPhone
                 , case when c.CO_Abbrev_Name is null or c.CO_Abbrev_Name ='' then CO_Name else c.CO_Abbrev_Name end as Company
                 , p.Title, p.Department
                 , case when p.PersID = c.Main_Contact_ID then 'Yes' else '' end as IsMainContact 
