@@ -1,10 +1,11 @@
 ﻿@{
     //co_id to associate Person with the CO they work for.
     var co_id = Request["id"];
+    var loc =  Request["loc"];
 
     var sSQL = "SELECT * FROM SchoolDetails where Loc_ID=@0";
     var db = Database.Open("DDIncV2");
-    var qryDet = db.QuerySingle(sSQL, co_id);
+    var qryDet = db.QuerySingle(sSQL, loc);
 
         var Accred_ID = qryDet.AccreditationID;
         var Title_IV = qryDet.Title_IV;
@@ -53,7 +54,12 @@
 
 }
 
-<h2>Edit School Details for @DDCHelpers.Form_CO_Name(co_id)</h2>
+<h3>Edit School Details for @DDCHelpers.Form_CO_Name(co_id),
+    @if (@DDCHelpers.Form_Loc_Name(loc) == "Main Campus") 
+    { <text>@DDCHelpers.Form_Loc_Name(loc).</text>} 
+    else
+    {<text>@DDCHelpers.Form_Loc_Name(loc) Campus.</text>}
+</h3>
 &nbsp
 <div style ="max-width: 500px; margin-left:2%;  ">
 <form action="" method="post">
@@ -154,9 +160,9 @@
 <br/>
 
 <p>
-    <a class="btn btn-default btn-lg" href="~/Datacap/School_Details/SchoolDetails.cshtml?id=@co_id" >Back</a>
+    <a class="btn btn-default btn-lg" href="~/Datacap/School_Details/SchoolDetails.cshtml?id=@co_id&loc=@loc" >Back</a>
     &nbsp
 
-    <a class="btn btn-default btn-lg pull-right" href="~/DataCap/School_Details/DeleteDet.cshtml?id=@co_id" >Delete these Details</a>
+    <a class="btn btn-default btn-lg pull-right" href="~/DataCap/School_Details/DeleteDet.cshtml?id=@co_id&loc=@loc" >Delete these Details</a>
 
 </p>

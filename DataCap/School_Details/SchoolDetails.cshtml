@@ -28,7 +28,12 @@
 }
 
     
-<h3>School Details for @DDCHelpers.Form_CO_Name(co_id)</h3>
+<h3>School Details for @DDCHelpers.Form_CO_Name(co_id), 
+@if (@DDCHelpers.Form_Loc_Name(loc) == "Main Campus") 
+    { <text>@DDCHelpers.Form_Loc_Name(loc).</text>} 
+    else
+    {<text>@DDCHelpers.Form_Loc_Name(loc) Campus.</text>}
+</h3>
 <br/>
 
 <div class="table-responsive">
