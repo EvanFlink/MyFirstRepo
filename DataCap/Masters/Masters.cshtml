@@ -5,17 +5,20 @@
     var sSQL2 = "SELECT * FROM Masters where Active in (1) and Master like @0";
     var Master_String = "%" + Request["Master_String"] +"%";
     var qryMaster = db.Query(sSQL2, Master_String);
+
+//MstrID identifies the Master Type; ie Accreditation, PhoneType, etc. Next two lines prep for creating a new Item.
     var sSQL3 = "SELECT Master_ID FROM Master_Types where Master = @0";
     var MstrID =db.QueryValue(sSQL3, Request["Master_String"]);
+
     var gMaster = new WebGrid(qryMaster, rowsPerPage: 10);
     
 }
 
 <h2>Work with the 'Masters' Table</h2><br/>
 
-<div style ="max-width: 768px; margin-left:2%;  ">
 <form action="" method="post">
-    <fieldset>
+<div id="grid">
+
         <label for="Master_String" class="control-label">Select Master Type</label>
         <div class="form-group form-inline"> 
                 <select name="Master_String" size="1" class="form-control" style="width:200px;" >
@@ -26,10 +29,9 @@
                     <option @(Request["Master_String"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
                 } </select>
         <input type="submit" value="Select" class="btn btn-md btn-default" />
-        </div>
-    </fieldset>
-</form>
-</div>
+    </div>
+
+
 &nbsp
 
 
@@ -57,6 +59,8 @@
     <p>&nbsp</p>
 </div>
 </div>
+</div>
+</form>
 
 
 <p>
@@ -70,7 +74,8 @@
 @section script{
 <script type="text/javascript">
    $(function(){
-        $('th a, tfoot a').live('click', function() {
+//        $('th a, tfoot a').live('click', function() {
+        $(document).on('click', 'th a, tfoot a', function () {
             $('form').attr('action', $(this).attr('href')).submit();
             return false;
         });
