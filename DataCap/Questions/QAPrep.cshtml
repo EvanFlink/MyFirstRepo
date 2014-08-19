@@ -7,8 +7,41 @@
                 inner join dbo.Masters as Dept on Dept.Item_ID = Q.Dept_ID
                 left join dbo.Masters as Grp on Grp.Item_ID = Q.Group_ID";
 
+    var selCat = "%" + Request["selCat"] +"%";
+    var selDept = "%" + Request["selDept"] +"%";
+    var selGroup = "%" + Request["selGroup"] +"%";
+
     var db = Database.Open("DDIncV2");
-    var qryQuestions = db.Query(sSQL);
+
+    var catList = db.Query(@DDCHelpers.MasterListQuery("Question Category")); 
+    var deptList = db.Query(@DDCHelpers.MasterListQuery("Department")); 
+    var groupList = db.Query(@DDCHelpers.MasterListQuery("Question Group")); 
+    var ActiveList = new string[]{"Active", "Inactive"};
+    var whereClause = " where";
+    if(selCat != "%%") {
+        whereClause = whereClause + " Cat.Item like '" + selCat +"'";
+         }
+    
+    if(selDept != "%%") {
+        if (whereClause != " where") {whereClause = whereClause + " and";}
+        whereClause = whereClause + " Dept.Item like '" + selDept +"'";
+         }
+    if(selGroup != "%%") {
+        if (whereClause != " where") {whereClause = whereClause + " and";}
+        whereClause = whereClause + " Grp.Item like '" + selGroup +"'";
+         }
+
+    switch (Request["ActiveStr"]){
+            case "Active": 
+                if (whereClause != " where") {whereClause = whereClause + " and";}
+                whereClause = whereClause + " Q.Active = 1"; break;
+            case "Inactive": 
+                if (whereClause != " where") {whereClause = whereClause + " and";}
+                whereClause = whereClause + " Q.Active = 0"; break;
+        }
+
+    if (whereClause != " where") {sSQL = sSQL + whereClause;}
+    var qryQuestions = db.Query(sSQL, selCat, selDept, selGroup);
 
      var gQ = new WebGrid(qryQuestions, rowsPerPage: 10);
 
@@ -20,8 +53,8 @@
 <h4>Question Set for:</h4>
 <div style ="max-width: 768px; margin-left:2%;  ">
 <form action="" method="post">
-    <fieldset name="Question Set for:">
-        <table>
+    <fieldset style="border: 1px solid #999; border-style: groove; border-radius: 8px; padding: 1em 2.5em 2em 2.5em;">
+       <table>
             <tr>
                 <th>School</th>
                 <th>Campus</th>
@@ -72,29 +105,47 @@
 <p>&nbsp</p>
 <h4>Filter Questions on:</h4>
 <div style ="max-width: 768px; margin-left:2%;  ">
-<form action="" method="post">
-    <fieldset name="Filter Questions on:">
+    <fieldset style="border: 1px solid #999; border-style: groove; border-radius: 8px; padding: 1em 2.5em 2em 2.5em;">
+       
         <table>
             <tr>
                 <th>Category</th>
                 <th>Department</th>
                 <th>Group</th>
+                <th><label for="ActiveStr" class="control-label">Show Active/Inactive</label></th>
                 <th></th>
             </tr>
             <tr>
                 <td>
-                    <select name="Category" size="1" class="form-control" style="width:200px;" >
-                    <option disabled selected> -- select an option -- </option>
+                    <select name="selCat" size="1" class="form-control" style="width:200px;" >
+                    <option value="" selected> Any Category</option>
+                        @foreach (var row in catList) {
+                        <option @(Request["selCat"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
+                        }
                     </select>
                 </td>
                 <td>
-                    <select name="Dept" size="1" class="form-control" style="width:200px;" >
-                    <option disabled selected> -- select an option -- </option>
+                    <select name="selDept" size="1" class="form-control" style="width:200px;" >
+                    <option value="" selected> Any Department</option>
+                        @foreach (var row in deptList) {
+                        <option @(Request["selDept"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
+                        }
                     </select>
                 </td>
                 <td>
-                    <select name="Group" size="1" class="form-control" style="width:200px;" >
-                    <option disabled selected> -- select an option -- </option>
+                    <select name="selGroup" size="1" class="form-control" style="width:200px;" >
+                    <option value="" selected> Any Group</option>
+                        @foreach (var row in groupList) {
+                        <option @(Request["selGroup"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <select name="ActiveStr" size="1" class="form-control" style="width:200px;" >
+                        <option value="All" selected>All</option>
+                        @foreach (var listItem in ActiveList) {
+                        <option @(Request["ActiveStr"] == listItem ? " selected=\"selected\"" : "")>@listItem</option>
+                        }
                     </select>
                 </td>
                 <td>
@@ -103,8 +154,7 @@
             </tr>
         </table>
     </fieldset>
-</form>
-</div>
+</div><br/>
 <p>&nbsp</p>
 
 
@@ -120,7 +170,7 @@
     columns: 
     gQ.Columns(
         gQ.Column("", header: "Select", format: 
-        @<text><a class="btn btn-default btn-xs" title="Create a New Question" href="~/DataCap/Questions/CreateQ.cshtml" >Add</a> </text> ),
+        @<text><a class="btn btn-success btn-xs" title="Create a New Question" href="~/DataCap/Questions/CreateQ.cshtml" >Add</a> </text> ),
         gQ.Column("Question", "Question"),
         gQ.Column("Category", "Category"),
         gQ.Column("Department", "Department"),
@@ -137,3 +187,15 @@
     <a class="btn btn-default btn-lg" href="~/index.cshtml" >Home</a>
     &nbsp
 </p>
+
+@section script{
+<script type="text/javascript">
+    $(function () {
+        //        $('th a, tfoot a').live('click', function() {
+        $(document).on('click', 'th a, tfoot a', function () {
+            $('form').attr('action', $(this).attr('href')).submit();
+            return false;
+        });
+    });
+</script>
+}

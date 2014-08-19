@@ -1,14 +1,21 @@
 ﻿@{
-    var sSQL = "SELECT Master_ID as Item_ID, Master as Item FROM Master_Types where Active in (1)";
+    var sSQL = "SELECT Master_ID as Item_ID, Master as Item FROM Master_Types where Active = 1";
     var db = Database.Open("DDIncV2");
     var sel_MTypes = db.Query(sSQL);
-    var sSQL2 = "SELECT * FROM Masters where Active in (1) and Master like @0";
-    var Master_String = "%" + Request["Master_String"] +"%";
-    var qryMaster = db.Query(sSQL2, Master_String);
+
+    var sSQL2 = "SELECT * FROM Masters where Master like @0";
+    switch (Request["ActiveStr"]){
+            case "Active": sSQL2 = sSQL2 + " and Active = 1"; break;
+            case "Inactive": sSQL2 = sSQL2 + " and Active = 0"; break;
+        }
+
+    var ActiveList = new string[]{"Active", "Inactive", "All"};
+    var selMstrType = "%" + Request["selMstrType"] +"%";
+    var qryMaster = db.Query(sSQL2, selMstrType);
 
 //MstrID identifies the Master Type; ie Accreditation, PhoneType, etc. Next two lines prep for creating a new Item.
     var sSQL3 = "SELECT Master_ID FROM Master_Types where Master = @0";
-    var MstrID =db.QueryValue(sSQL3, Request["Master_String"]);
+    var MstrID =db.QueryValue(sSQL3, Request["selMstrType"]);
 
     var gMaster = new WebGrid(qryMaster, rowsPerPage: 10);
     
@@ -18,17 +25,36 @@
 
 <form action="" method="post">
 <div id="grid">
-
-        <label for="Master_String" class="control-label">Select Master Type</label>
-        <div class="form-group form-inline"> 
-                <select name="Master_String" size="1" class="form-control" style="width:200px;" >
-                <option disabled selected> -- select an option -- </option>
-                <option value="">All Master Types</option>
-                @foreach(var row in sel_MTypes)
-                {
-                    <option @(Request["Master_String"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
-                } </select>
-        <input type="submit" value="Select" class="btn btn-md btn-default" />
+        <div class="form-group">
+       <table>
+            <tr>
+                <th><label for="selMstrType" class="control-label">Select Master Type</label></th>
+                <th><label for="ActiveStr" class="control-label">Show Active/Inactive</label></th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>
+                <select name="selMstrType" size="1" class="form-control" style="width:200px;" >
+                    <option disabled selected> -- select an option -- </option>
+                    <option value="">All Master Types</option>
+                    @foreach(var row in sel_MTypes) {
+                        <option @(Request["selMstrType"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
+                    } 
+                </select>
+                </td>
+                <td>
+                <select name="ActiveStr" size="1" class="form-control" style="width:200px;" >
+                    <option disabled selected> -- select an option -- </option>
+                    @foreach (var listItem in ActiveList) {
+                    <option @(Request["ActiveStr"] == listItem ? " selected=\"selected\"" : "")>@listItem</option>
+                    }
+                 </select>
+                 <td>
+                <td>
+                    <input type="submit" value="Select" class="btn btn-md btn-default" />
+                </td>
+            </tr>
+        </table>
     </div>
 
 
@@ -64,7 +90,7 @@
 
 
 <p>
-    <a class="btn btn-default btn-lg" href="~/index.cshtml" >Back</a>
+    <a class="btn btn-default btn-lg" href="~/index.cshtml" >Home</a>
     @if (qryMaster.Count() == 0)
     {
         <a class="btn btn-default btn-lg" href="~/DataCap/Masters/CreateMstrItem.cshtml?typeid=@MstrID" >Create New Item</a>        
@@ -73,8 +99,7 @@
 
 @section script{
 <script type="text/javascript">
-   $(function(){
-//        $('th a, tfoot a').live('click', function() {
+    $(function () {
         $(document).on('click', 'th a, tfoot a', function () {
             $('form').attr('action', $(this).attr('href')).submit();
             return false;

@@ -17,7 +17,7 @@
         Item_Name = Request["Item_Name"];
         Active_TF = Request["Active_TF"];
 
-        var SQLUPDATE = "UPDATE MasterTypes Set Master=@1, Active=@2  WHERE Master_ID=@0";
+        var SQLUPDATE = "UPDATE Master_Types Set Master=@1, Active=@2  WHERE Master_ID=@0";
 //        Response.Write(id + ", " + Mstr_Type_ID + ", " + Mstr_Type_Name + ", " + Item_Name + ", " + Active_TF);
         db.Execute(SQLUPDATE, id, Item_Name, Active_TF);
         Response.Redirect("MasterTypes.cshtml");
