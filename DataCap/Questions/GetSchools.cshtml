@@ -1,0 +1,14 @@
+﻿@{
+    Layout = null;
+//    var categoryId = UrlData[0].IsEmpty() ? 1 : UrlData[0].AsInt();  
+    var db = Database.Open("DDIncV2");
+    var sql = @"select CO.CO_ID, CO_Name + 
+				case when CO_Abbrev_Name = '' or CO_Abbrev_Name is null then '' 
+                else ' ( ' + CO_Abbrev_Name + ' )' end as Name
+                from dbo.Company as CO
+                inner join dbo.Masters as Type on type.Item_ID =co.CO_Type_ID
+                and (Type.Item = 'School')
+                order by co.CO_Name;";
+    var Person = db.Query(sql);
+    Json.Write(Person, Response.Output);
+}

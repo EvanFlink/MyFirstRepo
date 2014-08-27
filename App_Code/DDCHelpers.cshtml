@@ -7,6 +7,16 @@
              return Regex.IsMatch(s, pattern);
           }
      
+     public static string qrySchool()
+     {
+        return @"select CO.CO_ID, CO_Name + 
+				case when CO_Abbrev_Name = '' or CO_Abbrev_Name is null then '' 
+                else ' ( ' + CO_Abbrev_Name + ' )' end as Name
+                from dbo.Company as CO
+                inner join dbo.Masters as Type on type.Item_ID =co.CO_Type_ID
+                and (Type.Item = 'School')
+                order by co.CO_Name;";
+     } 
 
      public static string MasterListQuery(string MasterType)
      {
@@ -15,6 +25,7 @@
                 Where M.Active = 'True' and  MT.Master = '" + MasterType + "' ";
      } 
 
+//returns a list of FA Servicer, FA Auditors, Lead Gen's, etc
      public static string ThirdPartyListQuery(string ThirdPartyType)
      {
         return @"with m (ID, name, type) as (

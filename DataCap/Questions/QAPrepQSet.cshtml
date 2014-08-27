@@ -1,5 +1,7 @@
 ﻿@{
-    Page.Title = "Prep a Question Set";
+    Page.Title = "Prep the Question Set";
+
+//Question List
     var sSQL = @"select Q.Q_ID, Q.Question, Cat.Item as Category, Dept.Item as Department
                 , Grp.Item as Q_Group, Q.Active
                 from dbo.Question as Q
@@ -45,64 +47,19 @@
 
      var gQ = new WebGrid(qryQuestions, rowsPerPage: 10);
 
+
+
 }
 
 <p>&nbsp</p>
 <h2>@Page.Title</h2>
-<p>&nbsp</p>
-<h4>Question Set for:</h4>
-<div style ="max-width: 768px; margin-left:2%;  ">
-<form action="" method="post">
-    <fieldset style="border: 1px solid #999; border-style: groove; border-radius: 8px; padding: 1em 2.5em 2em 2.5em;">
-       <table>
-            <tr>
-                <th>School</th>
-                <th>Campus</th>
-                <th>Department</th>
-                <th>Person</th>
-                <th></th>
-            </tr>
-            <tr>
-                <td>
-                <select name="School" size="1" class="form-control" style="width:200px;" >
-                <option disabled selected> -- select an option -- </option>
-@*                @foreach(var row in sel_Schools)
-                {
-                    <option @(Request["School"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
-                }*@ </select>
-                </td>
-                <td>
-                <select name="Campus" size="1" class="form-control" style="width:200px;" >
-                <option disabled selected> -- select an option -- </option>
-@*                @foreach(var row in sel_Campus)
-                {
-                    <option @(Request["Campus"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
-                }*@ </select>
-                </td>
-                <td>
-                <select name="Campus" size="1" class="form-control" style="width:200px;" >
-                <option disabled selected> -- select an option -- </option>
-@*                @foreach(var row in sel_Campus)
-                {
-                    <option @(Request["Campus"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
-                }*@ </select>
-                </td>
-                <td>
-                <select name="Campus" size="1" class="form-control" style="width:200px;" >
-                <option disabled selected> -- select an option -- </option>
-@*                @foreach(var row in sel_Campus)
-                {
-                    <option @(Request["Campus"] == row.Item ? " selected=\"selected\"" : "")>@row.Item</option>
-                }*@ </select>
-                </td>
-                <td><input type="submit" value="Select" class="btn btn-md btn-default" /></td>
-            </tr>
-        </table>
 
-    </fieldset>
-</form>
-</div>
+<h3>Question Set for:</h3>
+<p>Table with SchoolName, Campus, Dept & Person goes here.</p>
+<p>SchoolName & Campus are required, Show 'Any' for Dept & Person when no selection is made.</p>
 <p>&nbsp</p>
+
+<form action="" method="post">
 <h4>Filter Questions on:</h4>
 <div style ="max-width: 768px; margin-left:2%;  ">
     <fieldset style="border: 1px solid #999; border-style: groove; border-radius: 8px; padding: 1em 2.5em 2em 2.5em;">
@@ -174,17 +131,16 @@
         gQ.Column("Question", "Question"),
         gQ.Column("Category", "Category"),
         gQ.Column("Department", "Department"),
-        gQ.Column("Q_Group", "Group")
+        gQ.Column("Q_Group", "Group"),
+        gQ.Column("Active", "Active")
         )
     )
 <br/><br/>
 </div>
-
-
-
+</form>
 
 <p>
-    <a class="btn btn-default btn-lg" href="~/index.cshtml" >Home</a>
+    <a class="btn btn-default btn-lg" href="~/DataCap/Questions/QAPrepCampus.cshtml" >Back</a>
     &nbsp
 </p>
 

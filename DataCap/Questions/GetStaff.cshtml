@@ -1,0 +1,15 @@
+﻿@{
+    Layout = null;
+    var categoryId = UrlData[0].IsEmpty() ? 1 : UrlData[0].AsInt();  
+    var db = Database.Open("DDIncV2");
+    var sql = @"select p.PersID, p.CO_ID
+                        , p.FirstName + ' ' + p.LastName +', ' + p.Title +  
+                        case when p.Department is null then '' else ', ' + p.Department end as Item
+                        from dbo.Person as P 
+                        inner join Company as C on c.CO_ID = p.CO_ID
+                        inner join dbo.Masters as Type on type.Item_ID =c.CO_Type_ID
+                        and (Type.Item = 'School')
+                        order by p.FirstName;";
+    var Person = db.Query(sql, categoryId);
+    Json.Write(Person, Response.Output);
+}

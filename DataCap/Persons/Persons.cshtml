@@ -17,10 +17,11 @@
     }
 
     //get current people, if none, then just display create form
-    sSQL = @"select p.PersID, p.CO_ID, p.FirstName, p.LastName, p.Title, p.Department,p.Phone1 
+    sSQL = @"select p.PersID, p.CO_ID, p.FirstName, p.LastName, p.Title, l.Loc_Branch_Name, p.Department,p.Phone1 
             , case when p.PersID = c.Main_Contact_ID then 'Yes' else '' end as IsMainContact 
             from dbo.Person as P 
             inner join Company as C on c.CO_ID = p.CO_ID
+            left join Location as L on L.LocationID = p.Loc_ID
             where P.CO_ID = @0";
     var qryPersons = db.Query(sSQL, co_id);
     var gPersons = new WebGrid(qryPersons, rowsPerPage: 15);
@@ -50,7 +51,8 @@
         gPersons.Column("FirstName", "First Name"),
         gPersons.Column("LastName", "Last Name"),
         gPersons.Column("Title", "Title"),
-        gPersons.Column("Department", "Department"),
+        gPersons.Column("Loc_Branch_Name", "Office/Campus"),
+        gPersons.Column("Department", "Dept."),
         gPersons.Column("Phone1", "Main Phone"),
         gPersons.Column("IsMainContact", header: "Main Contact?")
         )

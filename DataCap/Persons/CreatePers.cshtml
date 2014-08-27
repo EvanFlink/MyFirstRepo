@@ -4,12 +4,17 @@
         var Last_Name = "";
         var Title = "";
         var Department = "";
+        var Loc_Branch = "";
 
-        var sSQL = "";
         var db = Database.Open("DDIncV2");
 
 //construct the dropdown lists
         var sel_Dept = db.Query(@DDCHelpers.MasterListQuery("Department")); 
+        var sSQL = @"select l.LocationID as loc_id, l.Loc_Branch_Name as loc_branch 
+            from dbo.Location as l             
+			inner join Company as C on c.CO_ID = l.CO_ID
+            where C.CO_ID = @0";
+        var sel_Loc = db.Query(sSQL,co_id);
  
     if(IsPost)
     {
@@ -17,9 +22,10 @@
       Last_Name = Request["Last_Name"];
       Title = Request["Title"];
       Department = Request["Department"];
+      Loc_Branch = Request["Loc_Branch"];
 
-      var sqlInsert = "INSERT INTO Person (FirstName, LastName, Title, Department, CO_ID) Values (@0, @1, @2, @3, @4)";
-      db.Execute(sqlInsert, First_Name, Last_Name, Title, Department, co_id);
+      var sqlInsert = "INSERT INTO Person (FirstName, LastName, Title, Department, CO_ID, Loc_ID) Values (@0, @1, @2, @3, @4,@5)";
+      db.Execute(sqlInsert, First_Name, Last_Name, Title, Department, co_id, Loc_Branch);
       Response.Redirect("~/Datacap/Persons/Persons?id=" + @co_id);
     }
 
@@ -44,6 +50,15 @@
     <div class="form-group"> 
         <label for="Title" class="control-label">Title</label>
         <input type="text" name="Title" class="form-control" placeholder="Ex: Director of Admissions">
+    </div><br/>
+
+    <div class="form-group"> 
+        <label for="Loc_Branch" class="control-label">Department</label>
+            <select name="Loc_Branch" size="1" class="form-control">
+            @foreach(var row in sel_Loc)
+            {
+                <option value = "@row.loc_id">@row.loc_branch</option>
+            } </select>
     </div><br/>
 
     <div class="form-group"> 
