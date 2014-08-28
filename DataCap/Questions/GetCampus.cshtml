@@ -1,12 +1,13 @@
 ﻿@{
     Layout = null;
-    var categoryId = UrlData[0].IsEmpty() ? 1 : UrlData[0].AsInt();  
+    var schoolId = UrlData[0].IsEmpty() ? 0 : UrlData[0].AsInt();  
     var db = Database.Open("DDIncV2");
-    var sql = @"select l.LocationID as Loc_ID, l.CO_ID, l.Loc_Branch_Name as Campus from dbo.Location as l
+    var sql = @"select l.LocationID as Loc_ID, l.CO_ID, l.Loc_Branch_Name as CampusName from dbo.Location as l
                        inner join Company as C on c.CO_ID = l.CO_ID
                        inner join dbo.Masters as Type on type.Item_ID =c.CO_Type_ID
                        and (Type.Item = 'School')
+                       where l.CO_ID = @0
                        order by l.Loc_Branch_Name;";
-    var Campus = db.Query(sql, CO_ID);
-    Json.Write(Campus, Response.Output);
+    var Campuses = db.Query(sql, schoolId);
+    Json.Write(Campuses, Response.Output);
 }

@@ -1,14 +1,73 @@
 ﻿@{
     Page.Title = "QA Session";
+
+    //Staff Query
+   var sSQL_Person = @"select p.PersID, p.CO_ID
+                        , p.FirstName + ' ' + p.LastName +', ' + p.Title +  
+                        case when p.Department is null then '' else ', ' + p.Department end as Item
+                        from dbo.Person as P 
+                        inner join Company as C on c.CO_ID = p.CO_ID
+                        inner join dbo.Masters as Type on type.Item_ID =c.CO_Type_ID
+                        and (Type.Item = 'School')
+                        order by p.FirstName;";
+
+    var selPers = Request["selPers"];
+    var selDept = Request["selDept"];
+
+//    var db = Database.Open("DDIncV2");
+    var personList = db.Query(sSQL_Person);
+    var deptList = db.Query(@DDCHelpers.MasterListQuery("Department")); 
+
+
 }
 
 <p>&nbsp</p>
 <h2>@Page.Title</h2>
 <p>&nbsp</p>
 
-
-
+<h4>Select Person & Dept:</h4>
+<div style ="max-width: 768px; margin-left:2%;  ">
+<form action="" method="post" class="QAPrepCampus">
+    <fieldset style="border: 1px solid #999; border-style: groove; border-radius: 8px; padding: 1em 2.5em 2em 2.5em;">
+       <table>
+            <tr>
+                <th>Person</th>
+                <th>Department</th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>
+                <select name="selDept" size="1" class="form-control" style="width:150px;" >
+                    <option disabled selected>select an option</option>
+                    @foreach(var row in deptList) {
+                        <option value="@row.Item_ID" @(Request["selDept"] == row.Item_ID.ToString() ? " selected=\"selected\"" : "")>@row.Item</option>
+                    }
+                </select>
+                </td>
+                <td>
+                <select name="selPers" size="1" class="form-control" style="width:200px;" >
+                    <option disabled selected> -- select an option -- </option>
+                    @foreach(var row in personList) {
+                        <option value="@row.PersID" @(Request["selPers"] == row.PersID.ToString() ? " selected=\"selected\"" : "")>@row.Item</option>
+                    }
+                </select>
+                </td>
+                <td><input type="submit" value="Select" class="btn btn-md btn-default" /></td>
+            </tr>
+        </table>
+    </fieldset>
+</form>
+</div>
+<br/>
 <p>
-    <a class="btn btn-default btn-lg" href="~/index.cshtml" >Back to Menu</a>
+    <a class="btn btn-default btn-lg" href="~/index.cshtml" 
+    title="Click to return to the Home Page">Home</a>
     &nbsp
+    @if (String.IsNullOrEmpty(selSchool) || String.IsNullOrEmpty(selCampus)){
+    <a class="btn btn-default btn-lg disabled" 
+    href="~/DataCap/Questions/QAPrepQset.cshtml?co_id=@selSchool&loc=@selCampus&dept=@selDept&pers=@selPers" 
+    title="Select a School and Campus to proceed.">Next</a>
+    } else {
+    <a class="btn btn-default btn-lg" href="~/DataCap/Questions/QAPrepQset.cshtml?co_id=@selSchool&loc=@selCampus&dept=@selDept&pers=@selPers" >Next</a>
+    }
 </p>
