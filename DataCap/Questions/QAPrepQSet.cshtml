@@ -1,8 +1,9 @@
 ﻿@{
-    Page.Title = "Prep the Question Set";
+    var school = Request["co_id"];
+    var campus = Request["loc"];
 
 //Question List
-    var sSQL = @"select Q.Q_ID, Q.Question, Cat.Item as Category, Dept.Item as Department
+    var sSQL = @"select Q.Q_ID, 1 as Selected, Q.Question, Cat.Item as Category, Dept.Item as Department
                 , Grp.Item as Q_Group, Q.Active
                 from dbo.Question as Q
                 inner join dbo.Masters as Cat on Cat.Item_ID =Q.Cat_ID
@@ -51,19 +52,16 @@
 
 }
 
-<p>&nbsp</p>
-<h2>@Page.Title</h2>
 
-<h3>Question Set for:</h3>
-<p>Table with SchoolName, Campus, Dept & Person goes here.</p>
-<p>SchoolName & Campus are required, Show 'Any' for Dept & Person when no selection is made.</p>
+<h2>Create Question Set</h2>
+<h4>School: @DDCHelpers.Form_CO_Name(school)&nbsp &nbsp &nbsp &nbsp Campus: @DDCHelpers.Form_Loc_Name(campus)</h4>
 <p>&nbsp</p>
 
 <form action="" method="post">
 <h4>Filter Questions on:</h4>
-<div style ="max-width: 768px; margin-left:2%;  ">
+<div style ="max-width: 1000px; margin-left:2%;  ">
     <fieldset style="border: 1px solid #999; border-style: groove; border-radius: 8px; padding: 1em 2.5em 2em 2.5em;">
-       
+
         <table>
             <tr>
                 <th>Category</th>
@@ -114,7 +112,7 @@
 </div><br/>
 <p>&nbsp</p>
 
-
+@ObjectInfo.Print(gQ)
 <div class="table-responsive">
     @gQ.GetHtml(
     tableStyle: "table webgrid-table",
@@ -126,8 +124,8 @@
     mode: WebGridPagerModes.All,
     columns: 
     gQ.Columns(
-        gQ.Column("", header: "Select", format: 
-        @<text><a class="btn btn-success btn-xs" title="Create a New Question" href="~/DataCap/Questions/CreateQ.cshtml" >Add</a> </text> ),
+        gQ.Column("Q_ID", header: "Select", format: 
+        @<text><a class="btn btn-warning btn-xs" title="Remove from Question Set" href="#" data-id="gQ.Q_ID" >Remove</a> </text> ),
         gQ.Column("Question", "Question"),
         gQ.Column("Category", "Category"),
         gQ.Column("Department", "Department"),
@@ -147,11 +145,16 @@
 @section script{
 <script type="text/javascript">
     $(function () {
-        //        $('th a, tfoot a').live('click', function() {
+
         $(document).on('click', 'th a, tfoot a', function () {
             $('form').attr('action', $(this).attr('href')).submit();
             return false;
         });
+
+        $('#removeButton').on('click', function () { 
+            $('button').attr('class', $(this).attr('class'));
+        });
     });
+
 </script>
 }

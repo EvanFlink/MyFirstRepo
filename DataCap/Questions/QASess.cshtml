@@ -14,7 +14,7 @@
     var selPers = Request["selPers"];
     var selDept = Request["selDept"];
 
-//    var db = Database.Open("DDIncV2");
+    var db = Database.Open("DDIncV2");
     var personList = db.Query(sSQL_Person);
     var deptList = db.Query(@DDCHelpers.MasterListQuery("Department")); 
 

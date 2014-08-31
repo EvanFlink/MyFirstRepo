@@ -1,17 +1,9 @@
 ﻿@{
     Page.Title = "Enter School and Campus Info";
         var db = Database.Open("DDIncV2");
-        var data = db.Query(DDCHelpers.qrySchool());
-        var schoolList = data.Select(item => new SelectListItem {
-            Value = item.CO_ID.ToString(),
-            Text = item.Name});
+        var schoolList = db.Query(DDCHelpers.qrySchool());
 
-
-//Our dataset should be small so prequery School, Campus, Department & Person, then filter
-// the child selection based on the parent; ie filter campus based on school
-//Schools Query - moved to DDCHelpers.qrySchool()
-
-   var sSQL_Campus = @"select l.LocationID as Loc_ID, l.CO_ID, l.Loc_Branch_Name as Campus from dbo.Location as l
+    var sSQL_Campus = @"select l.LocationID as Loc_ID, l.CO_ID, l.Loc_Branch_Name as Campus from dbo.Location as l
                        inner join Company as C on c.CO_ID = l.CO_ID
                        inner join dbo.Masters as Type on type.Item_ID =c.CO_Type_ID
                        and (Type.Item = 'School')
@@ -28,34 +20,45 @@
 
 @section JSforQAPrepCampus {
 <script>
-           $(function () {
-                //lvl2Select is set to the level 2 dropdown id
-                var lvl2Select = $('#selCampus');
-                lvl2Select.attr('disabled', true);
-                //on change event handler for the level 1 dropdown
-                $('#selSchool').change(function () {
-                    //get the selected value
-                    var schoolId = $(this).val();
-                    //filter the level 2 dropdown list using the value from above. 
-                    //L2 list is made by invoking code on GetProducts.cshtml
-                    $.getJSON('/Datacap/Questions/GetCampus/' + schoolId, function (Campuses) {
-                        lvl2Select.attr('disabled', false);
-                        lvl2Select.empty();
-                        lvl2Select.append($('<option/>').attr('value', '').text('-- Select Campus --'));
-                        $.each(Campuses, function (index, Campus) {
-                            lvl2Select.append($('<option/>').attr('value', Campus.Loc_ID).text(Campus.CampusName));
-                        });
-                        if( schoolId === ''){ lvl2Select.attr('disabled', true); }
-                    });
+    $(document).ready(function () {
+        //lvl2Select is set to the level 2 dropdown id
+        var lvl2Select = $('#selCampus');
+        lvl2Select.attr('disabled', true);
+        //on change event handler for the level 1 dropdown
+        $('#selCampus').change(function () {
+            console.log($('#selCampus').val());
+            if ($('#selCampus').val() !== '0') {
+                //add code here to update the href on PrepCampusNextBtn to contain the parameters
+                //from selSchool & selCampus
+                var school = '?co_id=' + $('#selSchool').val();
+                var Campus = '&loc=' + $('#selCampus').val();
+                var dest = '/DataCap/Questions/QAPrepQset.cshtml' + school + Campus;
+                console.log(dest);
+                $('#PrepCampusNextBtn').attr('href', dest)
+                $('#PrepCampusNextBtn').removeClass('disabled')
+            }
+        });
+        $('#selSchool').change(function () {
+            //get the selected value
+            var schoolId = $(this).val();
+            //filter the level 2 dropdown list using the value from above. 
+            //L2 list is made by invoking code on GetProducts.cshtml
+            $.getJSON('/Datacap/Questions/GetCampus/' + schoolId, function (Campuses) {
+                lvl2Select.attr('disabled', false);
+                lvl2Select.empty();
+                lvl2Select.append($('<option/>').attr('value', '0').text('-- Select Campus --'));
+                $.each(Campuses, function (index, Campus) {
+                    lvl2Select.append($('<option/>').attr('value', Campus.Loc_ID).text(Campus.CampusName));
                 });
             });
+        });
+    });
 </script>
 }
 
 <h2>@Page.Title</h2>
 <p>&nbsp</p>
-@ObjectInfo.Print(String.IsNullOrEmpty(selSchool))
-@ObjectInfo.Print(selCampus)
+
 
 <h4>Select School, Campus, etc:</h4>
 <div style ="max-width: 768px; margin-left:2%;  ">
@@ -65,20 +68,17 @@
             <tr>
                 <th>School</th>
                 <th>Campus</th>
-                <th></th>
             </tr>
             <tr>
                 <td>
-@*                    @Html.DropDownList("CO_ID", "-- Select School --", selSchool)*@
-                <select name="selSchool" id="selSchool" size="1" class="form-control" style="width:200px;" >
-                    <option disabled selected>-- Select School --</option>
+                <select name="selSchool" id="selSchool" size="1" class="form-control" style="width:330px;" >
+                    <option disabled selected value="0">-- Select School --</option>
                     @foreach(var row in schoolList) {
-                        <option value="@row.Value" @(Request["selSchool"] == row.Value.ToString() ? " selected=\"selected\"" : "")>@row.Text</option>
+                        <option value="@row.CO_ID" @(Request["selSchool"] == row.CO_ID.ToString() ? " selected=\"selected\"" : "")>@row.Name</option>
                     }
                 </select>
                 </td>
                 <td>
-@*                    @Html.DropDownList("Loc_ID", "-- Select Campus --", Enumerable.Empty<SelectListItem>())*@
                 <select name="selCampus" id="selCampus" size="1" class="form-control" style="width:200px;" >
                     <option disabled selected>-- Select Campus --</option>
                     @foreach(var row in campusList) {
@@ -86,9 +86,6 @@
                     }
                 </select>
                 </td>
-                </select>
-                </td>
-                <td><input type="submit" value="Select" class="btn btn-md btn-default" /></td>
             </tr>
         </table>
     </fieldset>
@@ -99,12 +96,8 @@
     <a class="btn btn-default btn-lg" href="~/index.cshtml" 
     title="Click to return to the Home Page">Home</a>
     &nbsp
-    @if (String.IsNullOrEmpty(selSchool) || String.IsNullOrEmpty(selCampus)){
-    <a class="btn btn-default btn-lg disabled" 
+    <a class="btn btn-default btn-lg disabled" id="PrepCampusNextBtn"
     href="~/DataCap/Questions/QAPrepQset.cshtml?co_id=@selSchool&loc=@selCampus" 
     title="Select a School and Campus to proceed.">Next</a>
-    } else {
-    <a class="btn btn-default btn-lg" href="~/DataCap/Questions/QAPrepQset.cshtml?co_id=@selSchool&loc=@selCampus" >Next</a>
-    }
 </p>
 
