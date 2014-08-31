@@ -46,8 +46,6 @@
     if (whereClause != " where") {sSQL = sSQL + whereClause;}
     var qryQuestions = db.Query(sSQL, selCat, selDept, selGroup);
 
-     var gQ = new WebGrid(qryQuestions, rowsPerPage: 10);
-
 
 
 }
@@ -112,27 +110,31 @@
 </div><br/>
 <p>&nbsp</p>
 
-@ObjectInfo.Print(gQ)
+
 <div class="table-responsive">
-    @gQ.GetHtml(
-    tableStyle: "table webgrid-table",
-    headerStyle: "webgrid-header",
-    footerStyle: "webgrid-footer",
-    alternatingRowStyle: "webgrid-alternating-row",
-    selectedRowStyle: "webgrid-selected-row",
-    rowStyle: "webgrid-row-style",
-    mode: WebGridPagerModes.All,
-    columns: 
-    gQ.Columns(
-        gQ.Column("Q_ID", header: "Select", format: 
-        @<text><a class="btn btn-warning btn-xs" title="Remove from Question Set" href="#" data-id="gQ.Q_ID" >Remove</a> </text> ),
-        gQ.Column("Question", "Question"),
-        gQ.Column("Category", "Category"),
-        gQ.Column("Department", "Department"),
-        gQ.Column("Q_Group", "Group"),
-        gQ.Column("Active", "Active")
-        )
-    )
+   <table class="table">
+        <tr>
+            <th>Add to Set</th>
+            <th>ID</th>
+            <th>Question</th>
+            <th>Category</th>
+            <th>Department</th>
+            <th>Group</th>
+            <th>Active</th>
+        </tr>
+       @foreach(var line in qryQuestions){
+        <tr>
+            <td> <input type="checkbox" name="Selected" checked="checked" value="@line.Q_ID" /></td>
+            <td>@line.Q_ID </td>
+            <td>@line.Question </td>
+            <td>@line.Category </td>
+            <td>@line.Department </td>
+            <td>@line.Q_Group</td>
+            <td>@line.Active </td>
+        </tr>
+        }
+    </table>
+
 <br/><br/>
 </div>
 </form>
